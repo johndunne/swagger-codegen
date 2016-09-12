@@ -10,6 +10,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import io.swagger.codegen.*;
 import io.swagger.models.*;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.MapProperty;
+import io.swagger.models.properties.Property;
 import io.swagger.util.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,7 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
          * a different extension
          */
         modelTemplateFiles.clear();
+        modelTemplateFiles.put("models.mustache", ".go");
 
         /**
          * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
@@ -146,6 +150,7 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
         supportingFiles.add(new SupportingFile("routers.mustache", apiPath, "routers.go"));
         supportingFiles.add(new SupportingFile("logger.mustache", apiPath, "logger.go")); 
         supportingFiles.add(new SupportingFile("app.mustache", apiPath, "app.yaml"));        
+        supportingFiles.add(new SupportingFile("json_object.mustache", apiPath, "json_operations.go"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", apiPath, "README.md"));
     }
 
@@ -262,6 +267,53 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
 
         // e.g. PetApi.go => pet_api.go
         return underscore(name);
+    }
+
+    @Override
+    public String getTypeDeclaration(Property p) {
+        if(p instanceof ArrayProperty) {
+            ArrayProperty ap = (ArrayProperty) p;
+            Property inner = ap.getItems();
+            return "[]" + getTypeDeclaration(inner);
+        }
+        else if (p instanceof MapProperty) {
+            MapProperty mp = (MapProperty) p;
+            Property inner = mp.getAdditionalProperties();
+
+            return getSwaggerType(p) + "[string]" + getTypeDeclaration(inner);
+        }
+        //return super.getTypeDeclaration(p);
+
+        // Not using the supertype invocation, because we want to UpperCamelize
+        // the type.
+        String swaggerType = getSwaggerType(p);
+        if (typeMapping.containsKey(swaggerType)) {
+            return typeMapping.get(swaggerType);
+        }
+
+        if(typeMapping.containsValue(swaggerType)) {
+            return swaggerType;
+        }
+
+        if(languageSpecificPrimitives.contains(swaggerType)) {
+            return swaggerType;
+        }
+
+        return toModelName(swaggerType);
+    }
+
+    @Override
+    public String getSwaggerType(Property p) {
+        String swaggerType = super.getSwaggerType(p);
+        String type = null;
+        if(typeMapping.containsKey(swaggerType)) {
+            type = typeMapping.get(swaggerType);
+            if(languageSpecificPrimitives.contains(type))
+                return (type);
+        }
+        else
+            type = swaggerType;
+        return type;
     }
 
     @Override
