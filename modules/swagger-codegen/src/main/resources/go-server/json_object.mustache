@@ -1,0 +1,192 @@
+package {{packageName}}
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"fmt"
+	"io"
+	"net/http"
+	"log"
+	"os"
+	"runtime/debug"
+)
+
+const (
+	DB               = "test"
+	PUSH_TOKEN_TABLE = "push_token"
+	USER_TABLE       = "user"
+)
+
+var (
+	Trace   *log.Logger
+	Info    *log.Logger
+	Warning *log.Logger
+	Error   *log.Logger
+)
+
+func initLog( traceHandle io.Writer, infoHandle io.Writer, warningHandle io.Writer, errorHandle io.Writer) {
+
+	Trace = log.New(traceHandle,
+		"TRACE: ",
+		log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
+
+	Info = log.New(infoHandle,
+		"INFO: ",
+		log.Ldate | log.Ltime | log.Lshortfile)
+
+	Warning = log.New(warningHandle,
+		"WARNING: ",
+		log.Ldate | log.Ltime | log.Lshortfile)
+
+	Error = log.New(errorHandle,
+		"ERROR: ",
+		log.Ldate | log.Ltime | log.Lshortfile)
+}
+
+func init() {
+	initLog(os.Stdout, os.Stdout, os.Stdout, os.Stderr)
+}
+
+func SendClientCreatedOKResult(w http.ResponseWriter, request *http.Request, message string) {
+	SendClientCreatedJsonStringResult(w, request, fmt.Sprintf("{\"message\":\"%s\"}", message))
+}
+
+func SendClientCreatedOKObject(w http.ResponseWriter, request *http.Request, obj interface{}) {
+	response, err := json.Marshal(obj)
+	if err != nil {
+		SendClientErrorInternalServerErrorResult(w, request, err)
+	} else {
+		SendClientCreatedJsonStringResult(w, request, string(response))
+	}
+}
+
+func SendClientOKObject(w http.ResponseWriter, request *http.Request, obj interface{}) {
+	response, err := json.MarshalIndent(obj,"","   ")
+	if err != nil {
+		SendClientErrorInternalServerErrorResult(w, request, err)
+	} else {
+		SendClientOKJsonResult(w, request, string(response))
+	}
+}
+
+func SendClientCreatedJsonStringResult(w http.ResponseWriter, request *http.Request, message string) {
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, message)
+}
+
+func SendClientOKJsonResult(w http.ResponseWriter, request *http.Request, message string) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, message)
+}
+
+func SendClientOKMessageResult(w http.ResponseWriter, request *http.Request, message string) {
+	SendClientOKObject(w, request, map[string]string{"response":"ok","message":message})
+}
+
+func SendClientErrorBadRequestError(w http.ResponseWriter, request *http.Request, error error) {
+	Info.Println("BAD Request:[" + request.Method + "]{" + request.URL.Path + "}?" + request.URL.RawQuery )
+	SendClientErrorResult(w, request, http.StatusBadRequest, error.Error())
+}
+
+func SendClientErrorBadRequestMessage(w http.ResponseWriter, request *http.Request, message string) {
+	SendClientErrorResult(w, request, http.StatusBadRequest, message)
+}
+
+func SendClientErrorUnauthorizedResult(w http.ResponseWriter, request *http.Request, error_message string) {
+	SendClientErrorResult(w, request, http.StatusUnauthorized, error_message)
+}
+
+func SendClientErrorNotAcceptableResult(w http.ResponseWriter, request *http.Request, error_message string) {
+	SendClientErrorResult(w, request, http.StatusNotAcceptable, error_message)
+}
+
+func SendClientErrorNotAcceptableResultExtra(w http.ResponseWriter, request *http.Request, error_message string, extra map[string]interface{}) {
+	SendClientErrorResultExtra(w, request, http.StatusNotAcceptable, error_message, extra)
+}
+
+func SendClientErrorNotFoundResult(w http.ResponseWriter, request *http.Request, message string) {
+	SendClientErrorResult(w, request, http.StatusNotFound, message)
+}
+
+// An unexpceted error
+func SendClientErrorInternalServerErrorResult(w http.ResponseWriter, request *http.Request, error_message error) {
+	//err := errors.Wrap(error_message, 1)
+	//log.Println("Unexpected Error: Request:[" + request.Method + "]{" + request.URL.Path + "}?" + request.URL.RawQuery )
+	//log.Println(err.ErrorStack())
+	SendClientErrorResult(w, request, http.StatusInternalServerError, error_message.Error())
+}
+
+func sendClientErrorEmptyBodyResult(w http.ResponseWriter, request *http.Request, http_code int) {
+	Info.Printf("ERROR EMPTY BODY RESONSE: %d\n", http_code)
+	w.WriteHeader(http_code)
+	w.Header().Set("Content-Type", "application/json")
+}
+
+func SendClientErrorResult(w http.ResponseWriter, request *http.Request, http_code int, error_message string) {
+	w.WriteHeader(http_code)
+	//if http_code == http.StatusInternalServerError {
+		debug.PrintStack()
+	//}
+	Info.Printf("Client ERROR: %s\n", error_message)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, "{\"error\":\""+error_message+"\"}")
+}
+
+func SendClientErrorResultExtra(w http.ResponseWriter, request *http.Request, http_code int, error_message string, extra map[string]interface{} ) {
+	debug.PrintStack()
+	Error.Printf("ERROR: %s\n", error_message)
+	w.WriteHeader(http_code)
+	w.Header().Set("Content-Type", "application/json")
+	extra["error"] = error_message
+
+	response, new_object_err := json.Marshal(extra)
+	if new_object_err != nil {
+		SendClientErrorInternalServerErrorResult(w, request, new_object_err)
+	} else {
+		io.WriteString(w, string(response))
+	}
+
+}
+
+func NewHttpAPIError( error_code int, message string ) error{
+	return &HttpAPIError{error_code,message,nil}
+}
+func NewHttpAPIErrorBadRequest( message string ) error {
+	return &HttpAPIError{http.StatusBadRequest,message,nil}
+}
+func NewHttpAPIErrorForbidden( message string ) error {
+	return &HttpAPIError{http.StatusForbidden,message,nil}
+}
+func NewHttpAPIErrorNotAcceptable( message string ) error {
+	return &HttpAPIError{http.StatusNotAcceptable,message,nil}
+}
+func NewHttpAPIErrorUnauthorised( message string ) error {
+	return &HttpAPIError{http.StatusUnauthorized,message,nil}
+}
+func NewHttpAPIErrorNotFound( message string ) error {
+	return &HttpAPIError{http.StatusNotFound,message,nil}
+}
+
+func NewHttpAPIInternalErrorMessage( error string) error{
+	return &HttpAPIError{http.StatusInternalServerError,error,nil}
+}
+
+func NewHttpAPIInternalError( error error ) error{
+	return &HttpAPIError{http.StatusInternalServerError,"",error}
+}
+
+type HttpAPIError struct {
+	ErrorCode int `json:"error_code"`
+	ErrorMessage string `json:"error_message"`
+	ErrorObject error `json:"error"`
+}
+
+type HttpAPIResponse struct {
+	Message string `json:"message"`
+}
+
+func (e HttpAPIError) Error() string {
+	return fmt.Sprintf("%s (%d)", e.ErrorMessage, e.ErrorCode)
+}
