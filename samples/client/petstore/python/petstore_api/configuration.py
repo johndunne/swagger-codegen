@@ -223,6 +223,13 @@ class Configuration(object):
                     'key': 'api_key',
                     'value': self.get_api_key_with_prefix('api_key')
                 },
+            'http_basic_test':
+                {
+                    'type': 'basic',
+                    'in': 'header',
+                    'key': 'Authorization',
+                    'value': self.get_basic_auth_token()
+                },
 
             'petstore_auth':
                 {
@@ -230,13 +237,6 @@ class Configuration(object):
                     'in': 'header',
                     'key': 'Authorization',
                     'value': 'Bearer ' + self.access_token
-                },
-            'http_basic_test':
-                {
-                    'type': 'basic',
-                    'in': 'header',
-                    'key': 'Authorization',
-                    'value': self.get_basic_auth_token()
                 },
 
         }

@@ -144,6 +144,7 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
         cliOptions.clear();
         cliOptions.add(new CliOption(CodegenConstants.PACKAGE_NAME, "Go package name (convention: lowercase).")
                 .defaultValue("swagger"));
+        // Added for support of custom DB and oauth credentials
         cliOptions.add(new CliOption(PROJECT_NAME, "Project name in Xcode"));
         cliOptions.add(new CliOption(DB_BACKEND, "Which db should be used for the backend. gorm is currently available."));
         cliOptions.add(new CliOption(DB_USER, "The database username."));
