@@ -1,11 +1,74 @@
-package {{packageName}}
+package models
+
+/**
+  * Generated automatically from swagger-codegen. Don't edit here! There's no point :)
+  **/
+
+import (
+    "encoding/json"
+    "errors"
+    "regexp"
+)
+// {{#models}}{{#model}}{{#allVars}}{{#pattern}}{{#-first}}"regexp"{{/-first}}{{/pattern}}{{/allVars}}{{/model}}{{/models}}
+
+func dummy{{#models}}{{#model}}{{classname}}{{/model}}{{/models}}() error {
+    regemail := regexp.MustCompile(`/^.+@.+$/`)
+    if matches := regemail.FindStringSubmatch("dummy"); len(matches) == 0 {
+        return errors.New("Value 'dummy' does not match the pattern /^.+@.+$/")
+    }
+    return nil
+}
+
 {{#models}}
 {{#model}}{{#description}}
     // {{{description}}}{{/description}}
 type {{classname}} struct {
-{{#vars}}{{#description}}
-    // {{{description}}}{{/description}}
-    {{name}} {{{datatype}}} `json:"{{baseName}},omitempty"`
+{{#vars}}{{#description}}// {{{description}}}
+{{/description}}
+    {{nameInCamelCase}} {{{datatype}}} `json:"{{baseName}},omitempty" sql:"{{#isPrimitiveType}}{{#isNotContainer}}{{baseName}}{{/isNotContainer}}{{/isPrimitiveType}}{{^isPrimitiveType}}-{{/isPrimitiveType}}{{#isContainer}}-{{/isContainer}}"`
 {{/vars}}
 }
 {{/model}}{{/models}}
+
+
+{{#models}}{{#model}}
+func (obj *{{classname}}) Read(decoder *json.Decoder) error {
+{{#optionalVars}}/* {{nameInCamelCase}} = {{defaultValue}} */{{#defaultValue}}
+    obj.{{nameInCamelCase}} = {{#isString}}"{{defaultValue}}"{{/isString}}{{^isString}}{{defaultValue}}{{/isString}}{{/defaultValue}}
+{{/optionalVars}}
+    if err := decoder.Decode(&obj); err != nil {
+        return err
+    }
+    return nil
+}
+
+func (o {{classname}}) validateForCreate() error {
+{{#allVars}}{{#pattern}}
+    reg{{name}} := regexp.MustCompile(`{{pattern}}`)
+    if matches:=reg{{name}}.FindStringSubmatch(o.{{nameInCamelCase}});len(matches)==0 {
+        return errors.New("Value '{{name}}' does not match the pattern {{pattern}}")
+    }{{/pattern}}{{#maxLength}}
+    if len( o.{{nameInCamelCase}} ) >= {{maxLength}} {
+        return errors.New("Value '{{name}}' must not have a length greater than {{maxLength}}")
+    }{{/maxLength}}{{#minLength}}
+    if len( o.{{nameInCamelCase}} ) < {{minLength}} {
+        return errors.New("Value '{{name}}' must not have a length less than {{minLength}}")
+    }{{/minLength}}{{#maxItems}}
+    if len( o.{{nameInCamelCase}} ) >= {{maxLength}} {
+        return errors.New("Value '{{name}}' must not have more than {{maxLength}} items")
+    }{{/maxItems}}{{#minItems}}
+    if len( o.{{nameInCamelCase}} ) < {{minLength}} {
+        return errors.New("Value '{{name}}' must not have a less than {{minLength}} items")
+    }{{/minItems}}{{/allVars}}{{#requiredVars}}{{#isEnum}}
+    if {{#allowableValues}}{{#values}} o.{{nameInCamelCase}} != {{#isString}}"{{{.}}}"{{/isString}}{{^isString}}{{{.}}}{{/isString}}{{^-last}} && {{/-last}}{{/values}}{{/allowableValues}} {
+        return errors.New("Value '{{name}}' must be one of {{#allowableValues}}{{#values}}{{{.}}}{{^-last}}, {{/-last}}{{/values}}{{/allowableValues}}")
+    }{{/isEnum}}
+{{/requiredVars}}{{#optionalVars}}{{#minimum}}
+    if !(o.{{nameInCamelCase}} >{{^exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}}) {
+        return errors.New("Value '{{name}}' must be greater than {{minimum}}")
+    }{{/minimum}}{{#maximum}}
+    if o.{{nameInCamelCase}} >{{^exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}} {
+        return errors.New("Value '{{name}}' must be less than {{maximum}}")
+    }{{/maximum}}{{/optionalVars}}
+    return nil
+}{{/model}}{{/models}}

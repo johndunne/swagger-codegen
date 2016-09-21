@@ -1,20 +1,90 @@
-package {{packageName}}
+package controllers
 
-{{#operations}}
+/**
+* Generated automatically from swagger-codegen. Don't edit here! There's no point :)
+**/
+
+
 import (
-	"net/http"
+    "net/http"
+    "quickflickserver/{{handlers_package_name}}"
+    "quickflickserver/helpers"
+{{#operations}}{{#operation}}{{#bodyParams}}{{#-last}}    "encoding/json" //{{/-last}}{{/bodyParams}}{{/operation}}{{/operations}}
+{{#operations}}{{#operation}}{{#bodyParams}}{{#-last}}    "quickflickserver/models" //{{/-last}}{{/bodyParams}}{{/operation}}{{/operations}}
 )
 
-{{#operation}}
-func {{nickname}}(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-    w.WriteHeader(http.StatusOK)
+// Worth reading if you're using Martini: http://present.go-steel-programmers.org/martini-talk/martini.slide#14
 
-    if result, err, process_output := {{nickname}}Do(w,r);!process_output{
-    }else if err!=nil{
+{{#operations}}{{#operation}}
+
+func {{operationId}}(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+{{#createOrUpdateOperation}}
+    decoder := json.NewDecoder( r.Body )
+    obj := models.{{#bodyParams}}{{baseType}}{{/bodyParams}}{}
+    if decoder_error := (&obj).Read(decoder); decoder_error != nil {
+        if aerr, ok := decoder_error.(*helpers.HttpAPIError); ok {
+           helpers.SendClientJsonObject( w, r, aerr.ErrorCode, decoder_error )
+        } else {
+            helpers.SendClientJsonObject( w, r, 500, decoder_error )
+        }
+    }
+    {{#createOperation}}{{#uniqueItems_dont_work}}
+        // doesn't work
+        encountered := map[{{containerType}}]bool{}
+        result := []{{containerType}}{}
+        for v := range obj.{{nameInCamelCase}} {
+            if encountered[obj.{{nameInCamelCase}}[v]] == true {
+                return errors.New("Value '{{name}}' must contain only unique values.")
+            } else {
+                // Record this element as an encountered element.
+                encountered[obj.{{nameInCamelCase}}[v]] = true
+            }
+        }{{/uniqueItems_dont_work}}
+{{/createOperation}}
+    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do( w, r, obj );error_code == 0 {
+{{/createOrUpdateOperation}}
+{{^createOrUpdateOperation}}
+    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do(w,r );error_code == 0 {
+{{/createOrUpdateOperation}}
+        // error_code = 0 is taken to mean don't do anything. The function has already handled output to the client
+    } else if err != nil {
+        if aerr, ok := err.(*helpers.HttpAPIError); ok {
+            helpers.SendClientJsonObject( w, r, aerr.ErrorCode, err )
+        }else{
+            helpers.SendClientJsonObject( w, r, 500, err)
+        }
     }else{
+        helpers.SendClientJsonObject( w, r, error_code, result )
     }
 }
-
 {{/operation}}
 {{/operations}}
+
+/*func setupAuthBoss(){
+    ab := authboss.New() // Usually store this globally
+    ab.MountPath = "/authboss"
+    ab.LogWriter = os.Stdout
+
+    if err := ab.Init(); err != nil {
+        // Handle error, don't let program continue to run
+        panic(err)
+    }
+
+    // Make sure to put authboss's router somewhere
+    m.Router.AddRoute("GET","/authboss", ab.NewRouter().ServeHTTP)
+}*/
+
+{{#includePlaceHolderHandlers}}{{#operations}}
+    {{#operation}}
+{{#createOrUpdateOperation}}
+func {{operationId}}Do(w http.ResponseWriter, r *http.Request, obj {{#bodyParams}}{{baseType}}{{/bodyParams}} ) (interface{}, error, int) {
+{{/createOrUpdateOperation}}
+{{^createOrUpdateOperation}}
+func {{operationId}}Do(w http.ResponseWriter, r *http.Request) (interface{}, error, int) {
+{{/createOrUpdateOperation}}
+    return nil, nil, 0
+}
+    {{/operation}}
+{{/operations}}
+{{/includePlaceHolderHandlers}}

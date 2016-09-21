@@ -1,0 +1,18 @@
+package api
+
+/**
+* Generated automatically from swagger-codegen. Don't edit here! There's no point :)
+**/
+
+
+import (
+    "quickflickserver/db"
+    "quickflickserver/models"
+)
+
+func CreateModelsInDB(){
+    gorm_db:=db.GetGormDBOrFail()
+{{#models}}{{#model}}
+    gorm_db.AutoMigrate(&models.{{classname}}{}){{/model}}{{/models}}
+}
+
