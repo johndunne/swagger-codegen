@@ -2,51 +2,74 @@ package api
 
 /**
 * Generated automatically from swagger-codegen. Don't edit here! There's no point :)
+*  hasAuthMethods: {{hasAuthMethods}}
+*  authMethods: {{authMethods}}
+*
 **/
-
 
 import (
     "net/http"
     "fmt"
     "github.com/gorilla/mux"
     "github.com/urfave/negroni"
-    "quickflickserver/controllers"
+    "quickflickserver/controllers"{{#hasAuthMethods}}
+    "quickflickserver/apiauth"{{/hasAuthMethods}}
+    "errors"
 )
+
+type linkedHandler func(inner http.Handler) http.Handler
 
 type Route struct {
 	Name        string
 	Method      string
 	Pattern     string
+    Handler     []linkedHandler
 	HandlerFunc http.HandlerFunc
 }
 
 type Routes []Route
 
-func NewRouter() *negroni.Negroni {
-    CreateModelsInDB()
-
+func RunApiServer( bind_address string ) *negroni.Negroni {
+	if runningNegroni == nil{
+		runningNegroni = NewUninitialisedRouter()
+	}
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		var handler http.Handler
 		handler = route.HandlerFunc
 		handler = Logger(handler, route.Name)
+        for i := len(route.Handler)-1; i >= 0; i-- {
+            h:=route.Handler[i]
+            handler = h(handler)
+        }
 
 		router.
-			Methods(route.Method).
+		Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
 			Handler(handler)
 	}
-    //n := negroni.New(NewRecovery(), NewLogger(), NewStatic(http.Dir("public")))
+	//n := negroni.New(NewRecovery(), NewLogger(), NewStatic(http.Dir("public")))
 
-    n := negroni.New()
-    //n.Use(negroni.Recovery)
-    //n.Use(negroni.Logger)
-    //n.Use(negroni.Static)
-    n.UseHandler(router)
-
-    return n
+	//n.Use(negroni.Recovery)
+	//n.Use(negroni.Logger)
+	//n.Use(negroni.Static)
+	runningNegroni.UseHandler(router)
+	runningNegroni.Run(bind_address)
+	return runningNegroni
 }
+
+var runningNegroni *negroni.Negroni
+
+func NewUninitialisedRouter() *negroni.Negroni {
+	if runningNegroni!=nil{
+		panic(errors.New("There's already a server running"))
+	}
+	runningNegroni = negroni.New()
+	CreateModelsInDB()
+	return runningNegroni
+}
+
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World!")
@@ -63,14 +86,29 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"{{basePathWithoutHost}}/",
+        []linkedHandler{},
 		Index,
 	},
 {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
-	Route{
+    /* {{#authMethods}}
+        name : {{name}} type : {{type}}
+        *  isBasic: {{isBasic}}, isOAuth: {{isOAuth}}, isApiKey {{isApiKey}}
+        *  OAuth specific -> flow :{{flow}}, authorizationUrl: {{authorizationUrl}}, tokenUrl: {{tokenUrl}}
+        scopes: {{scopes}}
+        {{#scopes}}
+            {{scope}} -> {{description}}
+        {{/scopes}}
+        isCode:{{isCode}}, isPassword:{{isPassword}}, isApplication:{{isApplication}}, isImplicit:{{isImplicit}}
+        isKeyInQuery:{{isKeyInQuery}}, isKeyInHeader:{{isKeyInHeader}}
+    {{/authMethods}}
+        */
+
+    Route{ // {{authMethods}} {{security}}
 		"{{operationId}}",
 		"{{httpMethod}}",
 		"{{basePathWithoutHost}}{{path}}",
-		controllers.{{operationId}},
+    {{#hasAuthMethods}}[]linkedHandler{ {{#authMethods}}{{#scopes}} apiauth.ApiAuth{{scope}} {{^-last}},{{/-last}}{{/scopes}}{{/authMethods}} },{{/hasAuthMethods}} {{^authMethods}}[]linkedHandler{},{{/authMethods}}
+        controllers.{{operationId}},
 	},
 {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
 }

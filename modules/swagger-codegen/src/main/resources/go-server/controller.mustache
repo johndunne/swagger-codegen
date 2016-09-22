@@ -1,10 +1,11 @@
 package controllers
 
 /**
-* Generated automatically from swagger-codegen. Don't edit here! There's no point :)
-**/
-
-
+ * Generated automatically from swagger-codegen. Don't edit here! There's no point :)
+ * {{securityDefinitions}}
+ **/
+{{hasAuthMethods}}
+{{authMethods}}
 import (
     "net/http"
     "quickflickserver/{{handlers_package_name}}"
@@ -16,7 +17,19 @@ import (
 // Worth reading if you're using Martini: http://present.go-steel-programmers.org/martini-talk/martini.slide#14
 
 {{#operations}}{{#operation}}
-
+/* security: {{security}}
+ * {{#authMethods}}
+    name : {{name}} type : {{type}}
+ *  isBasic: {{isBasic}}, isOAuth: {{isOAuth}}, isApiKey {{isApiKey}}
+ *  OAuth specific -> flow :{{flow}}, authorizationUrl: {{authorizationUrl}}, tokenUrl: {{tokenUrl}}
+    scopes: {{scopes}}
+    {{#scopes}}
+        {{scope}} -> {{description}}
+    {{/scopes}}
+    isCode:{{isCode}}, isPassword:{{isPassword}}, isApplication:{{isApplication}}, isImplicit:{{isImplicit}}
+    isKeyInQuery:{{isKeyInQuery}}, isKeyInHeader:{{isKeyInHeader}}
+ * {{/authMethods}}
+ */
 func {{operationId}}(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 {{#createOrUpdateOperation}}
