@@ -32,7 +32,7 @@ import (
  */
 func {{operationId}}(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-{{#createOrUpdateOperation}}
+{{#createOrUpdateOperation}}{{#bodyParams}}
     decoder := json.NewDecoder( r.Body )
     obj := models.{{#bodyParams}}{{baseType}}{{/bodyParams}}{}
     if decoder_error := (&obj).Read(decoder); decoder_error != nil {
@@ -54,8 +54,11 @@ func {{operationId}}(w http.ResponseWriter, r *http.Request) {
                 encountered[obj.{{nameInCamelCase}}[v]] = true
             }
         }{{/uniqueItems_dont_work}}
-{{/createOperation}}
+{{/createOperation}}{{/bodyParams}}{{#bodyParams}}
     if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do( w, r, obj );error_code == 0 {
+{{/bodyParams}}{{^bodyParams}}
+    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do( w, r );error_code == 0 {
+{{/bodyParams}}
 {{/createOrUpdateOperation}}
 {{^createOrUpdateOperation}}
     if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do(w,r );error_code == 0 {
