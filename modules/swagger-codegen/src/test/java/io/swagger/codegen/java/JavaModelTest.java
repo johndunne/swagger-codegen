@@ -360,6 +360,32 @@ public class JavaModelTest {
         Assert.assertTrue(property.isNotContainer);
     }
 
+    @Test(description = "convert a model starting with two upper-case letter property names")
+    public void firstTwoUpperCaseLetterNamesTest() {
+        final Model model = new ModelImpl()
+                .description("a model with a property name starting with two upper-case letters")
+                .property("ATTName", new StringProperty())
+                .required("ATTName");
+        final DefaultCodegen codegen = new JavaClientCodegen();
+        final CodegenModel cm = codegen.fromModel("sample", model);
+
+        Assert.assertEquals(cm.name, "sample");
+        Assert.assertEquals(cm.classname, "Sample");
+        Assert.assertEquals(cm.vars.size(), 1);
+
+        final CodegenProperty property = cm.vars.get(0);
+        Assert.assertEquals(property.baseName, "ATTName");
+        Assert.assertEquals(property.getter, "getAtTName");
+        Assert.assertEquals(property.setter, "setAtTName");
+        Assert.assertEquals(property.datatype, "String");
+        Assert.assertEquals(property.name, "atTName");
+        Assert.assertEquals(property.defaultValue, "null");
+        Assert.assertEquals(property.baseType, "String");
+        Assert.assertNull(property.hasMore);
+        Assert.assertTrue(property.required);
+        Assert.assertTrue(property.isNotContainer);
+    }
+
     @Test(description = "convert hyphens per issue 503")
     public void hyphensTest() {
         final Model model = new ModelImpl()
@@ -496,4 +522,29 @@ public class JavaModelTest {
         Assert.assertEquals(cm.name, name);
         Assert.assertEquals(cm.classname, expectedName);
     }
+
+    @DataProvider(name = "classProperties")
+    public static Object[][] classProperties() {
+        return new Object[][] {
+                {"class", "getPropertyClass", "setPropertyClass", "propertyClass"},
+                {"_class", "getPropertyClass", "setPropertyClass", "propertyClass"},
+                {"__class", "getPropertyClass", "setPropertyClass", "propertyClass"}
+        };
+    }
+
+    @Test(dataProvider = "classProperties", description = "handle 'class' properties")
+    public void classPropertyTest(String baseName, String getter, String setter, String name) {
+        final Model model = new ModelImpl()
+                .description("a sample model")
+                .property(baseName, new StringProperty());
+        final DefaultCodegen codegen = new JavaClientCodegen();
+        final CodegenModel cm = codegen.fromModel("sample", model);
+
+        final CodegenProperty property = cm.vars.get(0);
+        Assert.assertEquals(property.baseName, baseName);
+        Assert.assertEquals(property.getter, getter);
+        Assert.assertEquals(property.setter, setter);
+        Assert.assertEquals(property.name, name);
+    }
+
 }

@@ -57,6 +57,7 @@ public protocol ParameterEncoding {
     func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest
 }
 
+<<<<<<< HEAD
 // MARK: -
 
 /// Creates a url-encoded query string to be set as or appended to any existing URL query string or set as the HTTP
@@ -83,6 +84,60 @@ public struct URLEncoding: ParameterEncoding {
     }
 
     // MARK: Properties
+=======
+// MARK: ParameterEncoding
+
+/**
+    Used to specify the way in which a set of parameters are applied to a URL request.
+
+    - `URL`:             Creates a query string to be set as or appended to any existing URL query for `GET`, `HEAD`,
+                         and `DELETE` requests, or set as the body for requests with any other HTTP method. The
+                         `Content-Type` HTTP header field of an encoded request with HTTP body is set to
+                         `application/x-www-form-urlencoded; charset=utf-8`. Since there is no published specification
+                         for how to encode collection types, the convention of appending `[]` to the key for array
+                         values (`foo[]=1&foo[]=2`), and appending the key surrounded by square brackets for nested
+                         dictionary values (`foo[bar]=baz`).
+
+    - `URLEncodedInURL`: Creates query string to be set as or appended to any existing URL query. Uses the same
+                         implementation as the `.URL` case, but always applies the encoded result to the URL.
+
+    - `JSON`:            Uses `NSJSONSerialization` to create a JSON representation of the parameters object, which is
+                         set as the body of the request. The `Content-Type` HTTP header field of an encoded request is
+                         set to `application/json`.
+
+    - `PropertyList`:    Uses `NSPropertyListSerialization` to create a plist representation of the parameters object,
+                         according to the associated format and write options values, which is set as the body of the
+                         request. The `Content-Type` HTTP header field of an encoded request is set to
+                         `application/x-plist`.
+
+    - `Custom`:          Uses the associated closure value to construct a new request given an existing request and
+                         parameters.
+*/
+public enum ParameterEncoding {
+    case URL
+    case URLEncodedInURL
+    case JSON
+    case PropertyList(NSPropertyListFormat, NSPropertyListWriteOptions)
+    case Custom((URLRequestConvertible, [String: AnyObject]?) -> (NSMutableURLRequest, NSError?))
+
+    /**
+        Creates a URL request by encoding parameters and applying them onto an existing request.
+
+        - parameter URLRequest: The request to have parameters applied.
+        - parameter parameters: The parameters to apply.
+
+        - returns: A tuple containing the constructed request and the error that occurred during parameter encoding,
+                   if any.
+    */
+    public func encode(
+        URLRequest: URLRequestConvertible,
+        parameters: [String: AnyObject]?)
+        -> (NSMutableURLRequest, NSError?)
+    {
+        var mutableURLRequest = URLRequest.URLRequest
+
+        guard let parameters = parameters else { return (mutableURLRequest, nil) }
+>>>>>>> upstream/master
 
     /// Returns a default `URLEncoding` instance.
     public static var `default`: URLEncoding { return URLEncoding() }
@@ -99,6 +154,7 @@ public struct URLEncoding: ParameterEncoding {
     /// The destination defining where the encoded query string is to be applied to the URL request.
     public let destination: Destination
 
+<<<<<<< HEAD
     // MARK: Initialization
 
     /// Creates a `URLEncoding` instance using the specified destination.
@@ -138,6 +194,58 @@ public struct URLEncoding: ParameterEncoding {
         } else {
             if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
                 urlRequest.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+=======
+            if let method = Method(rawValue: mutableURLRequest.HTTPMethod) where encodesParametersInURL(method) {
+                if let
+                    URLComponents = NSURLComponents(URL: mutableURLRequest.URL!, resolvingAgainstBaseURL: false)
+                    where !parameters.isEmpty
+                {
+                    let percentEncodedQuery = (URLComponents.percentEncodedQuery.map { $0 + "&" } ?? "") + query(parameters)
+                    URLComponents.percentEncodedQuery = percentEncodedQuery
+                    mutableURLRequest.URL = URLComponents.URL
+                }
+            } else {
+                if mutableURLRequest.valueForHTTPHeaderField("Content-Type") == nil {
+                    mutableURLRequest.setValue(
+                        "application/x-www-form-urlencoded; charset=utf-8",
+                        forHTTPHeaderField: "Content-Type"
+                    )
+                }
+
+                mutableURLRequest.HTTPBody = query(parameters).dataUsingEncoding(
+                    NSUTF8StringEncoding,
+                    allowLossyConversion: false
+                )
+            }
+        case .JSON:
+            do {
+                let options = NSJSONWritingOptions()
+                let data = try NSJSONSerialization.dataWithJSONObject(parameters, options: options)
+
+                if mutableURLRequest.valueForHTTPHeaderField("Content-Type") == nil {
+                    mutableURLRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                }
+
+                mutableURLRequest.HTTPBody = data
+            } catch {
+                encodingError = error as NSError
+            }
+        case .PropertyList(let format, let options):
+            do {
+                let data = try NSPropertyListSerialization.dataWithPropertyList(
+                    parameters,
+                    format: format,
+                    options: options
+                )
+
+                if mutableURLRequest.valueForHTTPHeaderField("Content-Type") == nil {
+                    mutableURLRequest.setValue("application/x-plist", forHTTPHeaderField: "Content-Type")
+                }
+
+                mutableURLRequest.HTTPBody = data
+            } catch {
+                encodingError = error as NSError
+>>>>>>> upstream/master
             }
 
             urlRequest.httpBody = query(parameters).data(using: .utf8, allowLossyConversion: false)
@@ -238,7 +346,20 @@ public struct URLEncoding: ParameterEncoding {
 /// request. The `Content-Type` HTTP header field of an encoded request is set to `application/json`.
 public struct JSONEncoding: ParameterEncoding {
 
+<<<<<<< HEAD
     // MARK: Properties
+=======
+        //==========================================================================================================
+        //
+        //  Batching is required for escaping due to an internal bug in iOS 8.1 and 8.2. Encoding more than a few
+        //  hundred Chinese characters causes various malloc error crashes. To avoid this issue until iOS 8 is no
+        //  longer supported, batching MUST be used for encoding. This introduces roughly a 20% overhead. For more
+        //  info, please refer to:
+        //
+        //      - https://github.com/Alamofire/Alamofire/issues/206
+        //
+        //==========================================================================================================
+>>>>>>> upstream/master
 
     /// Returns a `JSONEncoding` instance with default writing options.
     public static var `default`: JSONEncoding { return JSONEncoding() }
@@ -260,7 +381,14 @@ public struct JSONEncoding: ParameterEncoding {
         self.options = options
     }
 
+<<<<<<< HEAD
     // MARK: Encoding
+=======
+            while index != string.endIndex {
+                let startIndex = index
+                let endIndex = index.advancedBy(batchSize, limit: string.endIndex)
+                let range = startIndex..<endIndex
+>>>>>>> upstream/master
 
     /// Creates a URL request by encoding parameters and applying them onto an existing request.
     ///

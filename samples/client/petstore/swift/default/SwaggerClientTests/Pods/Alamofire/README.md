@@ -926,8 +926,19 @@ open var sessionDidFinishEventsForBackgroundURLSession: ((URLSession) -> Void)?
 /// Overrides default behavior for URLSessionTaskDelegate method `urlSession(_:task:willPerformHTTPRedirection:newRequest:completionHandler:)`.
 open var taskWillPerformHTTPRedirection: ((URLSession, URLSessionTask, HTTPURLResponse, URLRequest) -> URLRequest?)?
 
+<<<<<<< HEAD
 /// Overrides default behavior for URLSessionDataDelegate method `urlSession(_:dataTask:willCacheResponse:completionHandler:)`.
 open var dataTaskWillCacheResponse: ((URLSession, URLSessionDataTask, CachedURLResponse) -> CachedURLResponse?)?
+=======
+```swift
+public enum BackendError: ErrorType {
+    case Network(error: NSError)
+    case DataSerialization(reason: String)
+    case JSONSerialization(error: NSError)
+    case ObjectSerialization(reason: String)
+    case XMLSerialization(error: NSError)
+}
+>>>>>>> upstream/master
 ```
 
 The following is a short example of how to use the `taskWillPerformHTTPRedirection` to avoid following redirects to any `apple.com` domains.

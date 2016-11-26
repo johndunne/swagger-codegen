@@ -116,7 +116,11 @@ open class PetAPI: APIBase {
         path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -172,7 +176,11 @@ open class PetAPI: APIBase {
   "color" : "Black",
   "gender" : "Female",
   "breed" : "Mixed"
+<<<<<<< HEAD
 }}]
+=======
+}, contentType=application/json}]
+>>>>>>> upstream/master
      
      - parameter status: (query) Status values that need to be considered for filter (optional, default to available)
 
@@ -279,7 +287,11 @@ open class PetAPI: APIBase {
   <tags>
   </tags>
   <status>string</status>
+<<<<<<< HEAD
 </Pet>}]
+=======
+</Pet>, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter tags: (query) Tags to filter by (optional)
 
@@ -338,6 +350,12 @@ open class PetAPI: APIBase {
      Find pet by ID
      - GET /pet/{petId}
      - Returns a pet when ID < 10.  ID > 10 or nonintegers will simulate API error conditions
+<<<<<<< HEAD
+=======
+     - API Key:
+       - type: apiKey api_key 
+       - name: api_key
+>>>>>>> upstream/master
      - OAuth:
        - type: oauth2
        - name: petstore_auth
@@ -389,7 +407,11 @@ open class PetAPI: APIBase {
   <tags>
   </tags>
   <status>string</status>
+<<<<<<< HEAD
 </Pet>}]
+=======
+</Pet>, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter petId: (path) ID of pet that needs to be fetched 
 
@@ -400,7 +422,11 @@ open class PetAPI: APIBase {
         path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  

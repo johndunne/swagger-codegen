@@ -12,8 +12,37 @@ class AlamofireRequestBuilderFactory: RequestBuilderFactory {
     }
 }
 
+public struct SynchronizedDictionary<K: Hashable, V> {
+
+    private var dictionary = [K: V]()
+    private let queue = dispatch_queue_create("SynchronizedDictionary", DISPATCH_QUEUE_CONCURRENT)
+
+    public subscript(key: K) -> V? {
+        get {
+            var value: V?
+
+            dispatch_sync(queue) {
+                value = self.dictionary[key]
+            }
+
+            return value
+        }
+
+        set {
+            dispatch_barrier_sync(queue) {
+                self.dictionary[key] = newValue
+            }
+        }
+    }
+
+}
+
 // Store manager to retain its reference
+<<<<<<< HEAD
 private var managerStore: [String: Alamofire.SessionManager] = [:]
+=======
+private var managerStore = SynchronizedDictionary<String, Alamofire.Manager>()
+>>>>>>> upstream/master
 
 class AlamofireRequestBuilder<T>: RequestBuilder<T> {
     required init(method: String, URLString: String, parameters: [String : Any]?, isBody: Bool) {
@@ -79,7 +108,11 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
         }
 
         let cleanupRequest = {
+<<<<<<< HEAD
             managerStore.removeValue(forKey: managerId)
+=======
+            managerStore[managerId] = nil
+>>>>>>> upstream/master
         }
 
         let validatedRequest = request.validate()

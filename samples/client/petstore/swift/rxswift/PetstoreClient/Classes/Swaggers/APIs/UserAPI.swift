@@ -216,7 +216,11 @@ open class UserAPI: APIBase {
         path = path.replacingOccurrences(of: "{username}", with: "\(username)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -263,8 +267,13 @@ open class UserAPI: APIBase {
      Get user by user name
      - GET /user/{username}
      - 
+<<<<<<< HEAD
      - examples: [{contentType=application/json, example={
   "firstName" : "aeiou",
+=======
+     - examples: [{example={
+  "id" : 123456789,
+>>>>>>> upstream/master
   "lastName" : "aeiou",
   "password" : "aeiou",
   "userStatus" : 123,
@@ -300,7 +309,11 @@ open class UserAPI: APIBase {
   <password>string</password>
   <phone>string</phone>
   <userStatus>0</userStatus>
+<<<<<<< HEAD
 </User>}]
+=======
+</User>, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter username: (path) The name that needs to be fetched. Use user1 for testing.  
 
@@ -311,7 +324,11 @@ open class UserAPI: APIBase {
         path = path.replacingOccurrences(of: "{username}", with: "\(username)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -360,8 +377,13 @@ open class UserAPI: APIBase {
      Logs user into the system
      - GET /user/login
      - 
+<<<<<<< HEAD
      - examples: [{contentType=application/json, example="aeiou"}, {contentType=application/xml, example=string}]
      - examples: [{contentType=application/json, example="aeiou"}, {contentType=application/xml, example=string}]
+=======
+     - examples: [{example="aeiou", contentType=application/json}, {example=string, contentType=application/xml}]
+     - examples: [{example="aeiou", contentType=application/json}, {example=string, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter username: (query) The user name for login (optional)
      - parameter password: (query) The password for login in clear text (optional)
@@ -427,7 +449,11 @@ open class UserAPI: APIBase {
         let path = "/user/logout"
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  

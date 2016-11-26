@@ -66,6 +66,7 @@ public struct DataResponse<Value> {
 
     /// The timeline of the complete lifecycle of the `Request`.
     public let timeline: Timeline
+<<<<<<< HEAD
 
     var _metrics: AnyObject?
 
@@ -83,6 +84,26 @@ public struct DataResponse<Value> {
         response: HTTPURLResponse?,
         data: Data?,
         result: Result<Value>,
+=======
+
+    /**
+        Initializes the `Response` instance with the specified URL request, URL response, server data and response
+        serialization result.
+
+        - parameter request:  The URL request sent to the server.
+        - parameter response: The server's response to the URL request.
+        - parameter data:     The data returned by the server.
+        - parameter result:   The result of response serialization.
+        - parameter timeline: The timeline of the complete lifecycle of the `Request`. Defaults to `Timeline()`.
+
+        - returns: the new `Response` instance.
+    */
+    public init(
+        request: NSURLRequest?,
+        response: NSHTTPURLResponse?,
+        data: NSData?,
+        result: Result<Value, Error>,
+>>>>>>> upstream/master
         timeline: Timeline = Timeline())
     {
         self.request = request
@@ -237,6 +258,7 @@ extension DownloadResponse: CustomStringConvertible, CustomDebugStringConvertibl
         output.append("[ResumeData]: \(resumeData?.count ?? 0) bytes")
         output.append("[Result]: \(result.debugDescription)")
         output.append("[Timeline]: \(timeline.debugDescription)")
+<<<<<<< HEAD
 
         return output.joined(separator: "\n")
     }
@@ -249,6 +271,8 @@ protocol Response {
     var _metrics: AnyObject? { get set }
     mutating func add(_ metrics: AnyObject?)
 }
+=======
+>>>>>>> upstream/master
 
 extension Response {
     mutating func add(_ metrics: AnyObject?) {

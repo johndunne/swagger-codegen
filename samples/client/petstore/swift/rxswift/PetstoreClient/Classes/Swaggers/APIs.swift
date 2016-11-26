@@ -6,10 +6,17 @@
 
 import Foundation
 
+<<<<<<< HEAD
 open class PetstoreClientAPI {
     open static var basePath = "http://petstore.swagger.io/v2"
     open static var credential: URLCredential?
     open static var customHeaders: [String:String] = [:]
+=======
+public class PetstoreClientAPI {
+    public static var basePath = "http://petstore.swagger.io/v2"
+    public static var credential: NSURLCredential?
+    public static var customHeaders: [String:String] = [:]  
+>>>>>>> upstream/master
     static var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory()
 }
 
@@ -49,22 +56,36 @@ open class RequestBuilder<T> {
         addHeaders(PetstoreClientAPI.customHeaders)
     }
     
+<<<<<<< HEAD
     open func addHeaders(_ aHeaders:[String:String]) {
+=======
+    public func addHeaders(aHeaders:[String:String]) {
+>>>>>>> upstream/master
         for (header, value) in aHeaders {
             headers[header] = value
         }
     }
     
+<<<<<<< HEAD
     open func execute(_ completion: @escaping (_ response: Response<T>?, _ error: Error?) -> Void) { }
 
     public func addHeader(name: String, value: String) -> Self {
+=======
+    public func execute(completion: (response: Response<T>?, error: ErrorType?) -> Void) { }
+
+    public func addHeader(name name: String, value: String) -> Self {
+>>>>>>> upstream/master
         if !value.isEmpty {
             headers[name] = value
         }
         return self
     }
     
+<<<<<<< HEAD
     open func addCredential() -> Self {
+=======
+    public func addCredential() -> Self {
+>>>>>>> upstream/master
         self.credential = PetstoreClientAPI.credential
         return self
     }

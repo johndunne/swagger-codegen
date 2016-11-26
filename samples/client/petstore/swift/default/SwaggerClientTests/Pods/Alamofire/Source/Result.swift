@@ -24,6 +24,7 @@
 
 import Foundation
 
+<<<<<<< HEAD
 /// Used to represent whether a request was successful or encountered an error.
 ///
 /// - success: The request and all post processing operations were successful resulting in the serialization of the
@@ -34,6 +35,19 @@ import Foundation
 public enum Result<Value> {
     case success(Value)
     case failure(Error)
+=======
+/**
+    Used to represent whether a request was successful or encountered an error.
+
+    - Success: The request and all post processing operations were successful resulting in the serialization of the
+               provided associated value.
+    - Failure: The request encountered an error resulting in a failure. The associated values are the original data
+               provided by the server as well as the error that caused the failure.
+*/
+public enum Result<Value, Error: ErrorType> {
+    case Success(Value)
+    case Failure(Error)
+>>>>>>> upstream/master
 
     /// Returns `true` if the result is a success, `false` otherwise.
     public var isSuccess: Bool {

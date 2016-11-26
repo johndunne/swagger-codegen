@@ -21,11 +21,11 @@ func dummy{{#models}}{{#model}}{{classname}}{{/model}}{{/models}}() error {
 
 {{#models}}
 {{#model}}{{#description}}
-    // {{{description}}}{{/description}}
+        // {{{description}}}{{/description}}
 type {{classname}} struct {
 {{#vars}}{{#description}}// {{{description}}}
 {{/description}}
-    {{nameInCamelCase}} {{{datatype}}} `json:"{{baseName}},omitempty" sql:"{{#isPrimitiveType}}{{#isNotContainer}}{{baseName}}{{/isNotContainer}}{{/isPrimitiveType}}{{^isPrimitiveType}}-{{/isPrimitiveType}}{{#isContainer}}-{{/isContainer}}"`
+    {{nameInCamelCase}} {{{datatype}}} `json:"{{baseName}},omitempty" sql:"{{#isPrimitiveType}}{{#isNotContainer}}{{baseName}}{{/isNotContainer}}{{/isPrimitiveType}}{{^isPrimitiveType}}-{{/isPrimitiveType}}{{#isPrimitiveType}}{{#isContainer}}-{{/isContainer}}{{/isPrimitiveType}}"`
 {{/vars}}
 }
 {{/model}}{{/models}}

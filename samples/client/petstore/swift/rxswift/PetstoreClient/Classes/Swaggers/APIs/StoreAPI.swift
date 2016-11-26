@@ -57,7 +57,11 @@ open class StoreAPI: APIBase {
         path = path.replacingOccurrences(of: "{orderId}", with: "\(orderId)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -118,7 +122,11 @@ open class StoreAPI: APIBase {
         let path = "/store/inventory"
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -194,7 +202,11 @@ open class StoreAPI: APIBase {
   <shipDate>2000-01-23T04:56:07.000Z</shipDate>
   <status>string</status>
   <complete>true</complete>
+<<<<<<< HEAD
 </Order>}]
+=======
+</Order>, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter orderId: (path) ID of pet that needs to be fetched 
 
@@ -205,7 +217,11 @@ open class StoreAPI: APIBase {
         path = path.replacingOccurrences(of: "{orderId}", with: "\(orderId)", options: .literal, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
+<<<<<<< HEAD
         let nillableParameters: [String:Any?] = [:]
+=======
+        let nillableParameters: [String:AnyObject?] = [:]
+>>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -252,7 +268,12 @@ open class StoreAPI: APIBase {
      Place an order for a pet
      - POST /store/order
      - 
+<<<<<<< HEAD
      - examples: [{contentType=application/json, example={
+=======
+     - examples: [{example={
+  "id" : 123456789,
+>>>>>>> upstream/master
   "petId" : 123456789,
   "quantity" : 123,
   "id" : 123456789,
@@ -281,7 +302,11 @@ open class StoreAPI: APIBase {
   <shipDate>2000-01-23T04:56:07.000Z</shipDate>
   <status>string</status>
   <complete>true</complete>
+<<<<<<< HEAD
 </Order>}]
+=======
+</Order>, contentType=application/xml}]
+>>>>>>> upstream/master
      
      - parameter body: (body) order placed for purchasing the pet (optional)
 

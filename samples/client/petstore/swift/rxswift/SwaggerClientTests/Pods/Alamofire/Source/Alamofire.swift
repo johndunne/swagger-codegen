@@ -35,6 +35,7 @@ public protocol URLConvertible {
     func asURL() throws -> URL
 }
 
+<<<<<<< HEAD
 extension String: URLConvertible {
     /// Returns a URL if `self` represents a valid URL string that conforms to RFC 2396 or throws an `AFError`.
     ///
@@ -62,6 +63,22 @@ extension URLComponents: URLConvertible {
         guard let url = url else { throw AFError.invalidURL(url: self) }
         return url
     }
+=======
+extension String: URLStringConvertible {
+    public var URLString: String { return self }
+}
+
+extension NSURL: URLStringConvertible {
+    public var URLString: String { return absoluteString }
+}
+
+extension NSURLComponents: URLStringConvertible {
+    public var URLString: String { return URL!.URLString }
+}
+
+extension NSURLRequest: URLStringConvertible {
+    public var URLString: String { return URL!.URLString }
+>>>>>>> upstream/master
 }
 
 // MARK: -
@@ -81,13 +98,19 @@ extension URLRequestConvertible {
     public var urlRequest: URLRequest? { return try? asURLRequest() }
 }
 
+<<<<<<< HEAD
 extension URLRequest: URLRequestConvertible {
     /// Returns a URL request or throws if an `Error` was encountered.
     public func asURLRequest() throws -> URLRequest { return self }
+=======
+extension NSURLRequest: URLRequestConvertible {
+    public var URLRequest: NSMutableURLRequest { return self.mutableCopy() as! NSMutableURLRequest }
+>>>>>>> upstream/master
 }
 
 // MARK: -
 
+<<<<<<< HEAD
 extension URLRequest {
     /// Creates an instance with the specified `method`, `urlString` and `headers`.
     ///
@@ -98,6 +121,25 @@ extension URLRequest {
     /// - returns: The new `URLRequest` instance.
     public init(url: URLConvertible, method: HTTPMethod, headers: HTTPHeaders? = nil) throws {
         let url = try url.asURL()
+=======
+func URLRequest(
+    method: Method,
+    _ URLString: URLStringConvertible,
+    headers: [String: String]? = nil)
+    -> NSMutableURLRequest
+{
+    let mutableURLRequest: NSMutableURLRequest
+
+    if let request = URLString as? NSMutableURLRequest {
+        mutableURLRequest = request
+    } else if let request = URLString as? NSURLRequest {
+        mutableURLRequest = request.URLRequest
+    } else {
+        mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: URLString.URLString)!)
+    }
+
+    mutableURLRequest.HTTPMethod = method.rawValue
+>>>>>>> upstream/master
 
         self.init(url: url)
 

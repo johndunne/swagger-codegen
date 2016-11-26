@@ -30,6 +30,7 @@ extension Request {
 
     fileprivate typealias ErrorReason = AFError.ResponseValidationFailureReason
 
+<<<<<<< HEAD
     /// Used to represent whether validation was successful or encountered an error resulting in a failure.
     ///
     /// - success: The validation was successful.
@@ -37,6 +38,29 @@ extension Request {
     public enum ValidationResult {
         case success
         case failure(Error)
+=======
+        - returns: The request.
+    */
+    public func validate<S: SequenceType where S.Generator.Element == Int>(statusCode acceptableStatusCode: S) -> Self {
+        return validate { _, response in
+            if acceptableStatusCode.contains(response.statusCode) {
+                return .Success
+            } else {
+                let failureReason = "Response status code was unacceptable: \(response.statusCode)"
+
+                let error = NSError(
+                    domain: Error.Domain,
+                    code: Error.Code.StatusCodeValidationFailed.rawValue,
+                    userInfo: [
+                        NSLocalizedFailureReasonErrorKey: failureReason,
+                        Error.UserInfoKeys.StatusCode: response.statusCode
+                    ]
+                )
+
+                return .Failure(error)
+            }
+        }
+>>>>>>> upstream/master
     }
 
     fileprivate struct MIMEType {
@@ -79,8 +103,16 @@ extension Request {
             return accept.components(separatedBy: ",")
         }
 
+<<<<<<< HEAD
         return ["*/*"]
     }
+=======
+        - returns: The request.
+    */
+    public func validate<S: SequenceType where S.Generator.Element == String>(contentType acceptableContentTypes: S) -> Self {
+        return validate { _, response in
+            guard let validData = self.delegate.data where validData.length > 0 else { return .Success }
+>>>>>>> upstream/master
 
     // MARK: Status Code
 
@@ -119,6 +151,7 @@ extension Request {
                 }
             }
 
+<<<<<<< HEAD
             let error: AFError = {
                 let reason: ErrorReason = .missingContentType(acceptableContentTypes: Array(acceptableContentTypes))
                 return AFError.responseValidationFailed(reason: reason)
@@ -131,6 +164,33 @@ extension Request {
             if let acceptableMIMEType = MIMEType(contentType), acceptableMIMEType.matches(responseMIMEType) {
                 return .success
             }
+=======
+            let contentType: String
+            let failureReason: String
+
+            if let responseContentType = response.MIMEType {
+                contentType = responseContentType
+
+                failureReason = (
+                    "Response content type \"\(responseContentType)\" does not match any acceptable " +
+                    "content types: \(acceptableContentTypes)"
+                )
+            } else {
+                contentType = ""
+                failureReason = "Response content type was missing and acceptable content type does not match \"*/*\""
+            }
+
+            let error = NSError(
+                domain: Error.Domain,
+                code: Error.Code.ContentTypeValidationFailed.rawValue,
+                userInfo: [
+                    NSLocalizedFailureReasonErrorKey: failureReason,
+                    Error.UserInfoKeys.ContentType: contentType
+                ]
+            )
+
+            return .Failure(error)
+>>>>>>> upstream/master
         }
 
         let error: AFError = {

@@ -66,6 +66,12 @@ public class StaticHtml2Generator extends DefaultCodegen implements CodegenConfi
     }
 
     @Override
+    public String escapeText(String input) {
+        // newline escaping disabled for HTML documentation for markdown to work correctly
+        return input;
+    }
+
+    @Override
     public String getHelp() {
         return "Generates a static HTML file.";
     }
@@ -149,4 +155,16 @@ public class StaticHtml2Generator extends DefaultCodegen implements CodegenConfi
     public String normalizeType(String type) {
         return type.replaceAll("\\b(Boolean|Integer|Number|String|Date)\\b", "'$1'");
     }
+
+    @Override
+    public String escapeQuotationMark(String input) {
+        // just return the original string
+        return input;
+    }
+
+    @Override
+    public String escapeUnsafeCharacters(String input) {
+        // just return the original string
+        return input;
+    }   
 }

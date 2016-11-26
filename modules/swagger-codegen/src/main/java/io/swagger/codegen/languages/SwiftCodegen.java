@@ -103,7 +103,11 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
                 );
         reservedWords = new HashSet<String>(
                 Arrays.asList(
-                    "Int", "Int32", "Int64", "Int64", "Float", "Double", "Bool", "Void", "String", "Character", "AnyObject", "Any",
+                    // name used by swift client
+                    "ErrorResponse",
+
+                    // swift keywords
+                    "Int", "Int32", "Int64", "Int64", "Float", "Double", "Bool", "Void", "String", "Character", "AnyObject",
                     "class", "Class", "break", "as", "associativity", "deinit", "case", "dynamicType", "convenience", "enum", "continue",
                     "false", "dynamic", "extension", "default", "is", "didSet", "func", "do", "nil", "final", "import", "else",
                     "self", "get", "init", "fallthrough", "Self", "infix", "internal", "for", "super", "inout", "let", "if",
@@ -386,12 +390,20 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
 
     @SuppressWarnings("static-method")
     public String toSwiftyEnumName(String value) {
+        if (value.matches("^-?\\d*\\.{0,1}\\d+.*")) { // starts with number
+            value = "Number" + value;
+            value = value.replaceAll("-", "Minus");
+            value = value.replaceAll("\\+", "Plus");
+            value = value.replaceAll("\\.", "Dot");
+        }
+        
         // Prevent from breaking properly cased identifier
         if (value.matches("[A-Z][a-z0-9]+[a-zA-Z0-9]*")) {
             return value;
         }
-        char[] separators = {'-', '_', ' ', ':'};
-        return WordUtils.capitalizeFully(StringUtils.lowerCase(value), separators).replaceAll("[-_  :]", "");
+
+        char[] separators = {'-', '_', ' ', ':', '/'};
+        return WordUtils.capitalizeFully(StringUtils.lowerCase(value), separators).replaceAll("[-_  :/]", "");
     }
 
 

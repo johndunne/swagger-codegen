@@ -24,6 +24,7 @@
 
 import Foundation
 
+<<<<<<< HEAD
 /// Types adopting the `URLConvertible` protocol can be used to construct URLs, which are then used to construct 
 /// URL requests.
 public protocol URLConvertible {
@@ -62,6 +63,41 @@ extension URLComponents: URLConvertible {
         guard let url = url else { throw AFError.invalidURL(url: self) }
         return url
     }
+=======
+// MARK: - URLStringConvertible
+
+/**
+    Types adopting the `URLStringConvertible` protocol can be used to construct URL strings, which are then used to
+    construct URL requests.
+*/
+public protocol URLStringConvertible {
+    /**
+        A URL that conforms to RFC 2396.
+
+        Methods accepting a `URLStringConvertible` type parameter parse it according to RFCs 1738 and 1808.
+
+        See https://tools.ietf.org/html/rfc2396
+        See https://tools.ietf.org/html/rfc1738
+        See https://tools.ietf.org/html/rfc1808
+    */
+    var URLString: String { get }
+}
+
+extension String: URLStringConvertible {
+    public var URLString: String { return self }
+}
+
+extension NSURL: URLStringConvertible {
+    public var URLString: String { return absoluteString }
+}
+
+extension NSURLComponents: URLStringConvertible {
+    public var URLString: String { return URL!.URLString }
+}
+
+extension NSURLRequest: URLStringConvertible {
+    public var URLString: String { return URL!.URLString }
+>>>>>>> upstream/master
 }
 
 // MARK: -
@@ -81,13 +117,19 @@ extension URLRequestConvertible {
     public var urlRequest: URLRequest? { return try? asURLRequest() }
 }
 
+<<<<<<< HEAD
 extension URLRequest: URLRequestConvertible {
     /// Returns a URL request or throws if an `Error` was encountered.
     public func asURLRequest() throws -> URLRequest { return self }
+=======
+extension NSURLRequest: URLRequestConvertible {
+    public var URLRequest: NSMutableURLRequest { return self.mutableCopy() as! NSMutableURLRequest }
+>>>>>>> upstream/master
 }
 
 // MARK: -
 
+<<<<<<< HEAD
 extension URLRequest {
     /// Creates an instance with the specified `method`, `urlString` and `headers`.
     ///
@@ -98,6 +140,25 @@ extension URLRequest {
     /// - returns: The new `URLRequest` instance.
     public init(url: URLConvertible, method: HTTPMethod, headers: HTTPHeaders? = nil) throws {
         let url = try url.asURL()
+=======
+func URLRequest(
+    method: Method,
+    _ URLString: URLStringConvertible,
+    headers: [String: String]? = nil)
+    -> NSMutableURLRequest
+{
+    let mutableURLRequest: NSMutableURLRequest
+
+    if let request = URLString as? NSMutableURLRequest {
+        mutableURLRequest = request
+    } else if let request = URLString as? NSURLRequest {
+        mutableURLRequest = request.URLRequest
+    } else {
+        mutableURLRequest = NSMutableURLRequest(URL: NSURL(string: URLString.URLString)!)
+    }
+
+    mutableURLRequest.HTTPMethod = method.rawValue
+>>>>>>> upstream/master
 
         self.init(url: url)
 
@@ -453,4 +514,23 @@ public func stream(with netService: NetService) -> StreamRequest {
     return SessionManager.default.stream(with: netService)
 }
 
+<<<<<<< HEAD
 #endif
+=======
+// MARK: Resume Data
+
+/**
+    Creates a request using the shared manager instance for downloading from the resume data produced from a
+    previous request cancellation.
+
+    - parameter resumeData:  The resume data. This is an opaque data blob produced by `NSURLSessionDownloadTask`
+                             when a task is cancelled. See `NSURLSession -downloadTaskWithResumeData:` for additional
+                             information.
+    - parameter destination: The closure used to determine the destination of the downloaded file.
+
+    - returns: The created download request.
+*/
+public func download(resumeData data: NSData, destination: Request.DownloadFileDestination) -> Request {
+    return Manager.sharedInstance.download(data, destination: destination)
+}
+>>>>>>> upstream/master

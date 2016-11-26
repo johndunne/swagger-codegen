@@ -189,12 +189,19 @@ extension DownloadRequest {
 
                 downloadResponse.add(self.delegate.metrics)
 
+<<<<<<< HEAD
                 completionHandler(downloadResponse)
             }
         }
 
         return self
     }
+=======
+        - parameter queue:              The queue on which the completion handler is dispatched.
+        - parameter responseSerializer: The response serializer responsible for serializing the request, response,
+                                        and data.
+        - parameter completionHandler:  The code to be executed once the request has finished.
+>>>>>>> upstream/master
 
     /// Adds a handler to be called once the request has finished.
     ///
@@ -361,11 +368,20 @@ extension Request {
     {
         guard error == nil else { return .failure(error!) }
 
+<<<<<<< HEAD
         if let response = response, emptyDataStatusCodes.contains(response.statusCode) { return .success("") }
 
         guard let validData = data else {
             return .failure(AFError.responseSerializationFailed(reason: .inputDataNil))
         }
+=======
+    /**
+        Creates a response serializer that returns a string initialized from the response data with the specified
+        string encoding.
+
+        - parameter encoding: The string encoding. If `nil`, the string encoding will be determined from the server
+                              response, falling back to the default HTTP default character set, ISO-8859-1.
+>>>>>>> upstream/master
 
         var convertedEncoding = encoding
 
@@ -375,7 +391,23 @@ extension Request {
             )
         }
 
+<<<<<<< HEAD
         let actualEncoding = convertedEncoding ?? String.Encoding.isoLatin1
+=======
+            guard let validData = data else {
+                let failureReason = "String could not be serialized. Input data was nil."
+                let error = Error.error(code: .StringSerializationFailed, failureReason: failureReason)
+                return .Failure(error)
+            }
+
+            var convertedEncoding = encoding
+
+            if let encodingName = response?.textEncodingName where convertedEncoding == nil {
+                convertedEncoding = CFStringConvertEncodingToNSStringEncoding(
+                    CFStringConvertIANACharSetNameToEncoding(encodingName)
+                )
+            }
+>>>>>>> upstream/master
 
         if let string = String(data: validData, encoding: actualEncoding) {
             return .success(string)
@@ -438,6 +470,7 @@ extension DownloadRequest {
                 return .failure(AFError.responseSerializationFailed(reason: .inputFileNil))
             }
 
+<<<<<<< HEAD
             do {
                 let data = try Data(contentsOf: fileURL)
                 return Request.serializeResponseString(encoding: encoding, response: response, data: data, error: error)
@@ -446,6 +479,12 @@ extension DownloadRequest {
             }
         }
     }
+=======
+        - parameter encoding:          The string encoding. If `nil`, the string encoding will be determined from the
+                                       server response, falling back to the default HTTP default character set,
+                                       ISO-8859-1.
+        - parameter completionHandler: A closure to be executed once the request has finished.
+>>>>>>> upstream/master
 
     /// Adds a handler to be called once the request has finished.
     ///
@@ -497,6 +536,7 @@ extension Request {
             return .failure(AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength))
         }
 
+<<<<<<< HEAD
         do {
             let json = try JSONSerialization.jsonObject(with: validData, options: options)
             return .success(json)
@@ -505,6 +545,11 @@ extension Request {
         }
     }
 }
+=======
+    /**
+        Creates a response serializer that returns a JSON object constructed from the response data using
+        `NSJSONSerialization` with the specified reading options.
+>>>>>>> upstream/master
 
 extension DataRequest {
     /// Creates a response serializer that returns a JSON object result type constructed from the response data using
@@ -612,11 +657,17 @@ extension Request {
     {
         guard error == nil else { return .failure(error!) }
 
+<<<<<<< HEAD
         if let response = response, emptyDataStatusCodes.contains(response.statusCode) { return .success(NSNull()) }
 
         guard let validData = data, validData.count > 0 else {
             return .failure(AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength))
         }
+=======
+    /**
+        Creates a response serializer that returns an object constructed from the response data using
+        `NSPropertyListSerialization` with the specified reading options.
+>>>>>>> upstream/master
 
         do {
             let plist = try PropertyListSerialization.propertyList(from: validData, options: options, format: nil)
@@ -691,6 +742,7 @@ extension DownloadRequest {
         }
     }
 
+<<<<<<< HEAD
     /// Adds a handler to be called once the request has finished.
     ///
     /// - parameter options:           The property list reading options. Defaults to `[]`.
@@ -698,6 +750,18 @@ extension DownloadRequest {
     ///
     /// - returns: The request.
     @discardableResult
+=======
+    /**
+        Adds a handler to be called once the request has finished.
+
+        - parameter options:           The property list reading options. `0` by default.
+        - parameter completionHandler: A closure to be executed once the request has finished. The closure takes 3
+                                       arguments: the URL request, the URL response, the server data and the result
+                                       produced while creating the property list.
+
+        - returns: The request.
+    */
+>>>>>>> upstream/master
     public func responsePropertyList(
         queue: DispatchQueue? = nil,
         options: PropertyListSerialization.ReadOptions = [],

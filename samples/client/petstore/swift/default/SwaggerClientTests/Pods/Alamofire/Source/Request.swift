@@ -24,6 +24,7 @@
 
 import Foundation
 
+<<<<<<< HEAD
 /// A type that can inspect and optionally adapt a `URLRequest` in some manner if necessary.
 public protocol RequestAdapter {
     /// Inspects and adapts the specified `URLRequest` in some manner if necessary and returns the result.
@@ -83,6 +84,13 @@ open class Request {
         case upload(TaskConvertible?, URLSessionTask?)
         case stream(TaskConvertible?, URLSessionTask?)
     }
+=======
+/**
+    Responsible for sending a request and receiving the response and associated data from the server, as well as
+    managing its underlying `NSURLSessionTask`.
+*/
+public class Request {
+>>>>>>> upstream/master
 
     // MARK: Properties
 
@@ -191,11 +199,24 @@ open class Request {
 
     // MARK: State
 
+<<<<<<< HEAD
     /// Resumes the request.
     open func resume() {
         guard let task = task else { delegate.queue.isSuspended = false ; return }
 
         if startTime == nil { startTime = CFAbsoluteTimeGetCurrent() }
+=======
+    /**
+        Sets a closure to be called periodically during the lifecycle of the request as data is written to or read
+        from the server.
+
+        - For uploads, the progress closure returns the bytes written, total bytes written, and total bytes expected
+          to write.
+        - For downloads and data tasks, the progress closure returns the bytes read, total bytes read, and total bytes
+          expected to read.
+
+        - parameter closure: The code to be executed periodically during the lifecycle of the request.
+>>>>>>> upstream/master
 
         task.resume()
 
@@ -210,7 +231,13 @@ open class Request {
     open func suspend() {
         guard let task = task else { return }
 
+<<<<<<< HEAD
         task.suspend()
+=======
+        This closure returns the bytes most recently received from the server, not including data from previous calls.
+        If this closure is set, data will only be available within this closure, and will not be saved elsewhere. It is
+        also important to note that the `response` closure will be called with nil `responseData`.
+>>>>>>> upstream/master
 
         NotificationCenter.default.post(
             name: Notification.Name.Task.DidSuspend,
@@ -257,7 +284,17 @@ extension Request: CustomStringConvertible {
     }
 }
 
+<<<<<<< HEAD
 // MARK: - CustomDebugStringConvertible
+=======
+    // MARK: - TaskDelegate
+
+    /**
+        The task delegate is responsible for handling all delegate callbacks for the underlying task as well as
+        executing all operations attached to the serial operation queue upon task completion.
+    */
+    public class TaskDelegate: NSObject {
+>>>>>>> upstream/master
 
 extension Request: CustomDebugStringConvertible {
     /// The textual representation used when written to an output stream, in the form of a cURL command.
@@ -457,8 +494,17 @@ open class DownloadRequest: Request {
     /// The resume data of the underlying download task if available after a failure.
     open var resumeData: Data? { return downloadDelegate.resumeData }
 
+<<<<<<< HEAD
     /// The progress of downloading the response data from the server for the request.
     open var progress: Progress { return downloadDelegate.progress }
+=======
+    /**
+        The textual representation used when written to an output stream, which includes the HTTP method and URL, as
+        well as the response status code if a response has been received.
+    */
+    public var description: String {
+        var components: [String] = []
+>>>>>>> upstream/master
 
     var downloadDelegate: DownloadTaskDelegate { return delegate as! DownloadTaskDelegate }
 

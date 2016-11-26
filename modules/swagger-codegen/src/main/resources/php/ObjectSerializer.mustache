@@ -6,8 +6,7 @@
  *
  * @category Class
  * @package  {{invokerPackage}}
- * @author   http://github.com/swagger-api/swagger-codegen
- * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
+ * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
 
@@ -25,13 +24,11 @@ namespace {{invokerPackage}};
  *
  * @category Class
  * @package  {{invokerPackage}}
- * @author   http://github.com/swagger-api/swagger-codegen
- * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
+ * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
 class ObjectSerializer
 {
-
     /**
      * Serialize data
      *
@@ -51,7 +48,7 @@ class ObjectSerializer
             }
             return $data;
         } elseif (is_object($data)) {
-            $values = array();
+            $values = [];
             foreach (array_keys($data::swaggerTypes()) as $property) {
                 $getter = $data::getters()[$property];
                 if ($data->$getter() !== null) {
@@ -207,26 +204,26 @@ class ObjectSerializer
      *
      * @return object|array|null an single or an array of $class instances
      */
-    public static function deserialize($data, $class, $httpHeaders = null, $discriminator = null)
+    public static function deserialize($data, $class, $httpHeaders = null)
     {
         if (null === $data) {
             return null;
         } elseif (substr($class, 0, 4) === 'map[') { // for associative array e.g. map[string,int]
             $inner = substr($class, 4, -1);
-            $deserialized = array();
+            $deserialized = [];
             if (strrpos($inner, ",") !== false) {
                 $subClass_array = explode(',', $inner, 2);
                 $subClass = $subClass_array[1];
                 foreach ($data as $key => $value) {
-                    $deserialized[$key] = self::deserialize($value, $subClass, null, $discriminator);
+                    $deserialized[$key] = self::deserialize($value, $subClass, null);
                 }
             }
             return $deserialized;
-        } elseif (strcasecmp(substr($class, -2), '[]') == 0) {
+        } elseif (strcasecmp(substr($class, -2), '[]') === 0) {
             $subClass = substr($class, 0, -2);
-            $values = array();
+            $values = [];
             foreach ($data as $key => $value) {
-                $values[] = self::deserialize($value, $subClass, null, $discriminator);
+                $values[] = self::deserialize($value, $subClass, null);
             }
             return $values;
         } elseif ($class === 'object') {
@@ -244,7 +241,7 @@ class ObjectSerializer
             } else {
                 return null;
             }
-        } elseif (in_array($class, array({{&primitives}}))) {
+        } elseif (in_array($class, [{{&primitives}}], true)) {
             settype($data, $class);
             return $data;
         } elseif ($class === '\SplFileObject') {
@@ -257,7 +254,6 @@ class ObjectSerializer
             }
             $deserialized = new \SplFileObject($filename, "w");
             $byte_written = $deserialized->fwrite($data);
- 
             if (Configuration::getDefaultConfiguration()->getDebug()) {
                 error_log("[DEBUG] Written $byte_written byte to $filename. Please move the file to a proper folder or delete the temp file after processing.".PHP_EOL, 3, Configuration::getDefaultConfiguration()->getDebugFile());
             }
@@ -265,6 +261,7 @@ class ObjectSerializer
             return $deserialized;
         } else {
             // If a discriminator is defined and points to a valid subclass, use it.
+            $discriminator = $class::DISCRIMINATOR;
             if (!empty($discriminator) && isset($data->{$discriminator}) && is_string($data->{$discriminator})) {
                 $subclass = '\{{invokerPackage}}\Model\\' . $data->{$discriminator};
                 if (is_subclass_of($subclass, $class)) {
@@ -281,7 +278,7 @@ class ObjectSerializer
 
                 $propertyValue = $data->{$instance::attributeMap()[$property]};
                 if (isset($propertyValue)) {
-                    $instance->$propertySetter(self::deserialize($propertyValue, $type, null, $discriminator));
+                    $instance->$propertySetter(self::deserialize($propertyValue, $type, null));
                 }
             }
             return $instance;

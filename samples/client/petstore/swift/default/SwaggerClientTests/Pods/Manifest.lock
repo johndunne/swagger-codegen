@@ -1,5 +1,9 @@
 PODS:
+<<<<<<< HEAD
   - Alamofire (4.0.0)
+=======
+  - Alamofire (3.4.2)
+>>>>>>> upstream/master
   - PetstoreClient (0.0.1):
     - Alamofire (~> 4.0)
 
@@ -11,9 +15,14 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
+<<<<<<< HEAD
   Alamofire: fef59f00388f267e52d9b432aa5d93dc97190f14
   PetstoreClient: bbde3383c51466fdda24ec28153ce2847ae5456f
+=======
+  Alamofire: 6aa33201d20d069e1598891cf928883ff1888c7a
+  PetstoreClient: 7489b461499be1b2c4e0ed6624ca76c8db506297
+>>>>>>> upstream/master
 
 PODFILE CHECKSUM: 84472aca2a88b7f7ed9fcd63e9f5fdb5ad4aab94
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.0.0

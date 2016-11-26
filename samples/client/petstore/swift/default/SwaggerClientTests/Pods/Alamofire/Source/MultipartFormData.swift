@@ -30,6 +30,7 @@ import MobileCoreServices
 import CoreServices
 #endif
 
+<<<<<<< HEAD
 /// Constructs `multipart/form-data` for uploads within an HTTP or HTTPS body. There are currently two ways to encode
 /// multipart form data. The first way is to encode the data directly in memory. This is very efficient, but can lead
 /// to memory issues if the dataset is too large. The second way is designed for larger datasets and will write all the
@@ -43,6 +44,23 @@ import CoreServices
 /// - https://www.ietf.org/rfc/rfc2045.txt
 /// - https://www.w3.org/TR/html401/interact/forms.html#h-17.13
 open class MultipartFormData {
+=======
+/**
+    Constructs `multipart/form-data` for uploads within an HTTP or HTTPS body. There are currently two ways to encode
+    multipart form data. The first way is to encode the data directly in memory. This is very efficient, but can lead
+    to memory issues if the dataset is too large. The second way is designed for larger datasets and will write all the
+    data to a single file on disk with all the proper boundary segmentation. The second approach MUST be used for
+    larger datasets such as video content, otherwise your app may run out of memory when trying to encode the dataset.
+
+    For more information on `multipart/form-data` in general, please refer to the RFC-2388 and RFC-2045 specs as well
+    and the w3 form documentation.
+
+    - https://www.ietf.org/rfc/rfc2388.txt
+    - https://www.ietf.org/rfc/rfc2045.txt
+    - https://www.w3.org/TR/html401/interact/forms.html#h-17.13
+*/
+public class MultipartFormData {
+>>>>>>> upstream/master
 
     // MARK: - Helper Types
 
@@ -113,11 +131,19 @@ open class MultipartFormData {
         self.boundary = BoundaryGenerator.randomBoundary()
         self.bodyParts = []
 
+<<<<<<< HEAD
         ///
         /// The optimal read/write buffer size in bytes for input and output streams is 1024 (1KB). For more
         /// information, please refer to the following article:
         ///   - https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Streams/Articles/ReadingInputStreams.html
         ///
+=======
+        /**
+         *  The optimal read/write buffer size in bytes for input and output streams is 1024 (1KB). For more
+         *  information, please refer to the following article:
+         *    - https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Streams/Articles/ReadingInputStreams.html
+         */
+>>>>>>> upstream/master
 
         self.streamBufferSize = 1024
     }
@@ -337,6 +363,7 @@ open class MultipartFormData {
 
     // MARK: - Data Encoding
 
+<<<<<<< HEAD
     /// Encodes all the appended body parts into a single `Data` value.
     ///
     /// It is important to note that this method will load all the appended body parts into memory all at the same
@@ -347,6 +374,20 @@ open class MultipartFormData {
     ///
     /// - returns: The encoded `Data` if encoding is successful.
     public func encode() throws -> Data {
+=======
+    /**
+        Encodes all the appended body parts into a single `NSData` object.
+
+        It is important to note that this method will load all the appended body parts into memory all at the same
+        time. This method should only be used when the encoded data will have a small memory footprint. For large data
+        cases, please use the `writeEncodedDataToDisk(fileURL:completionHandler:)` method.
+
+        - throws: An `NSError` if encoding encounters an error.
+
+        - returns: The encoded `NSData` if encoding is successful.
+    */
+    public func encode() throws -> NSData {
+>>>>>>> upstream/master
         if let bodyPartError = bodyPartError {
             throw bodyPartError
         }

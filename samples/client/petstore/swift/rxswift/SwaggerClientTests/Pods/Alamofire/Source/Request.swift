@@ -114,13 +114,34 @@ open class Request {
 
     var startTime: CFAbsoluteTime?
     var endTime: CFAbsoluteTime?
+<<<<<<< HEAD
+=======
+
+    // MARK: - Lifecycle
+>>>>>>> upstream/master
 
     var validations: [() -> Void] = []
 
+<<<<<<< HEAD
     private var taskDelegate: TaskDelegate
     private var taskDelegateLock = NSLock()
 
     // MARK: Lifecycle
+=======
+        switch task {
+        case is NSURLSessionUploadTask:
+            delegate = UploadTaskDelegate(task: task)
+        case is NSURLSessionDataTask:
+            delegate = DataTaskDelegate(task: task)
+        case is NSURLSessionDownloadTask:
+            delegate = DownloadTaskDelegate(task: task)
+        default:
+            delegate = TaskDelegate(task: task)
+        }
+
+        delegate.queue.addOperationWithBlock { self.endTime = CFAbsoluteTimeGetCurrent() }
+    }
+>>>>>>> upstream/master
 
     init(session: URLSession, requestTask: RequestTask, error: Error? = nil) {
         self.session = session
@@ -175,6 +196,7 @@ open class Request {
         return self
     }
 
+<<<<<<< HEAD
     /// Returns a base64 encoded basic authentication credential as an authorization header tuple.
     ///
     /// - parameter user:     The user.
@@ -183,6 +205,34 @@ open class Request {
     /// - returns: A tuple with Authorization header and credential value if encoding succeeds, `nil` otherwise.
     open static func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
         guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
+=======
+    /**
+        Returns a base64 encoded basic authentication credential as an authorization header dictionary.
+
+        - parameter user:     The user.
+        - parameter password: The password.
+
+        - returns: A dictionary with Authorization key and credential value or empty dictionary if encoding fails.
+    */
+    public static func authorizationHeader(user user: String, password: String) -> [String: String] {
+        guard let data = "\(user):\(password)".dataUsingEncoding(NSUTF8StringEncoding) else { return [:] }
+
+        let credential = data.base64EncodedStringWithOptions([])
+
+        return ["Authorization": "Basic \(credential)"]
+    }
+
+    // MARK: - Progress
+
+    /**
+        Sets a closure to be called periodically during the lifecycle of the request as data is written to or read
+        from the server.
+
+        - For uploads, the progress closure returns the bytes written, total bytes written, and total bytes expected
+          to write.
+        - For downloads and data tasks, the progress closure returns the bytes read, total bytes read, and total bytes
+          expected to read.
+>>>>>>> upstream/master
 
         let credential = data.base64EncodedString(options: [])
 
@@ -210,6 +260,7 @@ open class Request {
     open func suspend() {
         guard let task = task else { return }
 
+<<<<<<< HEAD
         task.suspend()
 
         NotificationCenter.default.post(
@@ -222,9 +273,55 @@ open class Request {
     /// Cancels the request.
     open func cancel() {
         guard let task = task else { return }
+=======
+    /**
+        Resumes the request.
+    */
+    public func resume() {
+        if startTime == nil { startTime = CFAbsoluteTimeGetCurrent() }
+
+        task.resume()
+        NSNotificationCenter.defaultCenter().postNotificationName(Notifications.Task.DidResume, object: task)
+    }
+
+    /**
+        Suspends the request.
+    */
+    public func suspend() {
+        task.suspend()
+        NSNotificationCenter.defaultCenter().postNotificationName(Notifications.Task.DidSuspend, object: task)
+    }
+
+    /**
+        Cancels the request.
+    */
+    public func cancel() {
+        if let
+            downloadDelegate = delegate as? DownloadTaskDelegate,
+            downloadTask = downloadDelegate.downloadTask
+        {
+            downloadTask.cancelByProducingResumeData { data in
+                downloadDelegate.resumeData = data
+            }
+        } else {
+            task.cancel()
+        }
+
+        NSNotificationCenter.defaultCenter().postNotificationName(Notifications.Task.DidCancel, object: task)
+    }
+
+    // MARK: - TaskDelegate
+
+    /**
+        The task delegate is responsible for handling all delegate callbacks for the underlying task as well as
+        executing all operations attached to the serial operation queue upon task completion.
+    */
+    public class TaskDelegate: NSObject {
+>>>>>>> upstream/master
 
         task.cancel()
 
+<<<<<<< HEAD
         NotificationCenter.default.post(
             name: Notification.Name.Task.DidCancel,
             object: self,
@@ -232,6 +329,16 @@ open class Request {
         )
     }
 }
+=======
+        let task: NSURLSessionTask
+        let progress: NSProgress
+
+        var data: NSData? { return nil }
+        var error: NSError?
+
+        var initialResponseTime: CFAbsoluteTime?
+        var credential: NSURLCredential?
+>>>>>>> upstream/master
 
 // MARK: - CustomStringConvertible
 
@@ -293,8 +400,19 @@ extension Request: CustomDebugStringConvertible {
                     components.append("-u \(credential.user!):\(credential.password!)")
                 }
             } else {
+<<<<<<< HEAD
                 if let credential = delegate.credential {
                     components.append("-u \(credential.user!):\(credential.password!)")
+=======
+                if challenge.previousFailureCount > 0 {
+                    disposition = .RejectProtectionSpace
+                } else {
+                    credential = self.credential ?? session.configuration.URLCredentialStorage?.defaultCredentialForProtectionSpace(challenge.protectionSpace)
+
+                    if credential != nil {
+                        disposition = .UseCredential
+                    }
+>>>>>>> upstream/master
                 }
             }
         }
@@ -402,11 +520,25 @@ open class DownloadRequest: Request {
 
     // MARK: Helper Types
 
+<<<<<<< HEAD
     /// A collection of options to be executed prior to moving a downloaded file from the temporary URL to the
     /// destination URL.
     public struct DownloadOptions: OptionSet {
         /// Returns the raw bitmask value of the option and satisfies the `RawRepresentable` protocol.
         public let rawValue: UInt
+=======
+        func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+            if initialResponseTime == nil { initialResponseTime = CFAbsoluteTimeGetCurrent() }
+
+            if let dataTaskDidReceiveData = dataTaskDidReceiveData {
+                dataTaskDidReceiveData(session, dataTask, data)
+            } else {
+                if let dataStream = dataStream {
+                    dataStream(data: data)
+                } else {
+                    mutableData.appendData(data)
+                }
+>>>>>>> upstream/master
 
         /// A `DownloadOptions` flag that creates intermediate directories for the destination URL if specified.
         public static let createIntermediateDirectories = DownloadOptions(rawValue: 1 << 0)
@@ -515,13 +647,25 @@ open class DownloadRequest: Request {
     }
 }
 
+<<<<<<< HEAD
 // MARK: -
+=======
+        if let credentialStorage = self.session.configuration.URLCredentialStorage {
+            let protectionSpace = NSURLProtectionSpace(
+                host: host,
+                port: URL.port?.integerValue ?? 0,
+                protocol: URL.scheme,
+                realm: host,
+                authenticationMethod: NSURLAuthenticationMethodHTTPBasic
+            )
+>>>>>>> upstream/master
 
 /// Specific type of `Request` that manages an underlying `URLSessionUploadTask`.
 open class UploadRequest: DataRequest {
 
     // MARK: Helper Types
 
+<<<<<<< HEAD
     enum Uploadable: TaskConvertible {
         case data(Data, URLRequest)
         case file(URL, URLRequest)
@@ -540,9 +684,37 @@ open class UploadRequest: DataRequest {
             case let .stream(_, urlRequest):
                 let urlRequest = try urlRequest.adapt(using: adapter)
                 task = queue.syncResult { session.uploadTask(withStreamedRequest: urlRequest) }
+=======
+        var headers: [NSObject: AnyObject] = [:]
+
+        if let additionalHeaders = session.configuration.HTTPAdditionalHeaders {
+            for (field, value) in additionalHeaders where field != "Cookie" {
+                headers[field] = value
+            }
+        }
+
+        if let headerFields = request.allHTTPHeaderFields {
+            for (field, value) in headerFields where field != "Cookie" {
+                headers[field] = value
+>>>>>>> upstream/master
             }
 
+<<<<<<< HEAD
             return task
+=======
+        for (field, value) in headers {
+            components.append("-H \"\(field): \(value)\"")
+        }
+
+        if let
+            HTTPBodyData = request.HTTPBody,
+            HTTPBody = String(data: HTTPBodyData, encoding: NSUTF8StringEncoding)
+        {
+            var escapedBody = HTTPBody.stringByReplacingOccurrencesOfString("\\\"", withString: "\\\\\"")
+            escapedBody = escapedBody.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
+
+            components.append("-d \"\(escapedBody)\"")
+>>>>>>> upstream/master
         }
     }
 

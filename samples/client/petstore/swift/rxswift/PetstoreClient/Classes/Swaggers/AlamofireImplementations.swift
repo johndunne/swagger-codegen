@@ -12,8 +12,37 @@ class AlamofireRequestBuilderFactory: RequestBuilderFactory {
     }
 }
 
+public struct SynchronizedDictionary<K: Hashable, V> {
+
+    private var dictionary = [K: V]()
+    private let queue = dispatch_queue_create("SynchronizedDictionary", DISPATCH_QUEUE_CONCURRENT)
+
+    public subscript(key: K) -> V? {
+        get {
+            var value: V?
+
+            dispatch_sync(queue) {
+                value = self.dictionary[key]
+            }
+
+            return value
+        }
+
+        set {
+            dispatch_barrier_sync(queue) {
+                self.dictionary[key] = newValue
+            }
+        }
+    }
+
+}
+
 // Store manager to retain its reference
+<<<<<<< HEAD
 private var managerStore: [String: Alamofire.SessionManager] = [:]
+=======
+private var managerStore = SynchronizedDictionary<String, Alamofire.Manager>()
+>>>>>>> upstream/master
 
 class AlamofireRequestBuilder<T>: RequestBuilder<T> {
     required init(method: String, URLString: String, parameters: [String : Any]?, isBody: Bool) {
@@ -51,12 +80,26 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                         fatalError("Unprocessable value \(v) with key \(k)")
                         break
                     }
+<<<<<<< HEAD
                 }
                 }, to: URLString, method: xMethod!, headers: nil, encodingCompletion: { encodingResult in
                 switch encodingResult {
                 case .success(let upload, _, _):
                     if let onProgressReady = self.onProgressReady {
                         onProgressReady(upload.progress)
+=======
+                },
+                encodingMemoryThreshold: Manager.MultipartFormDataEncodingMemoryThreshold,
+                encodingCompletion: { encodingResult in
+                    switch encodingResult {
+                    case .Success(let uploadRequest, _, _):
+                        if let onProgressReady = self.onProgressReady {
+                            onProgressReady(uploadRequest.progress)
+                        }
+                        self.processRequest(uploadRequest, managerId, completion)
+                    case .Failure(let encodingError):
+                        completion(response: nil, error: ErrorResponse.Error(415, nil, encodingError))
+>>>>>>> upstream/master
                     }
                     self.processRequest(request: upload, managerId, completion)
                 case .failure(let encodingError):
@@ -79,7 +122,11 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
         }
 
         let cleanupRequest = {
+<<<<<<< HEAD
             managerStore.removeValue(forKey: managerId)
+=======
+            managerStore[managerId] = nil
+>>>>>>> upstream/master
         }
 
         let validatedRequest = request.validate()
@@ -91,18 +138,31 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
 
                 if stringResponse.result.isFailure {
                     completion(
+<<<<<<< HEAD
                         nil,
                         ErrorResponse.Error(stringResponse.response?.statusCode ?? 500, stringResponse.data, stringResponse.result.error!)
+=======
+                        response: nil,
+                        error: ErrorResponse.Error(stringResponse.response?.statusCode ?? 500, stringResponse.data, stringResponse.result.error!)
+>>>>>>> upstream/master
                     )
                     return
                 }
 
                 completion(
+<<<<<<< HEAD
                     Response(
                         response: stringResponse.response!,
                         body: (stringResponse.result.value ?? "") as! T
                     ),
                     nil
+=======
+                    response: Response(
+                        response: stringResponse.response!,
+                        body: (stringResponse.result.value ?? "") as! T
+                    ),
+                    error: nil
+>>>>>>> upstream/master
                 )
             })
         case is Void.Type:
@@ -111,13 +171,19 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
 
                 if voidResponse.result.isFailure {
                     completion(
+<<<<<<< HEAD
                         nil,
                         ErrorResponse.Error(voidResponse.response?.statusCode ?? 500, voidResponse.data, voidResponse.result.error!)
+=======
+                        response: nil,
+                        error: ErrorResponse.Error(voidResponse.response?.statusCode ?? 500, voidResponse.data, voidResponse.result.error!)
+>>>>>>> upstream/master
                     )
                     return
                 }
 
                 completion(
+<<<<<<< HEAD
                     Response(
                         response: voidResponse.response!,
                         body: nil),
@@ -125,13 +191,28 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                 )
             })
         case is Data.Type:
+=======
+                    response: Response(
+                        response: voidResponse.response!,
+                        body: nil
+                    ),
+                    error: nil
+                )
+            })
+        case is NSData.Type:
+>>>>>>> upstream/master
             validatedRequest.responseData(completionHandler: { (dataResponse) in
                 cleanupRequest()
 
                 if (dataResponse.result.isFailure) {
                     completion(
+<<<<<<< HEAD
                         nil,
                         ErrorResponse.Error(dataResponse.response?.statusCode ?? 500, dataResponse.data, dataResponse.result.error!)
+=======
+                        response: nil,
+                        error: ErrorResponse.Error(dataResponse.response?.statusCode ?? 500, dataResponse.data, dataResponse.result.error!)
+>>>>>>> upstream/master
                     )
                     return
                 }
@@ -149,7 +230,11 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                 cleanupRequest()
 
                 if response.result.isFailure {
+<<<<<<< HEAD
                     completion(nil, ErrorResponse.Error(response.response?.statusCode ?? 500, response.data, response.result.error!))
+=======
+                    completion(response: nil, error: ErrorResponse.Error(response.response?.statusCode ?? 500, response.data, response.result.error!))
+>>>>>>> upstream/master
                     return
                 }
 
@@ -168,7 +253,11 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                     return
                 }
 
+<<<<<<< HEAD
                 completion(nil, ErrorResponse.Error(500, nil, NSError(domain: "localhost", code: 500, userInfo: ["reason": "unreacheable code"])))
+=======
+                completion(response: nil, error: ErrorResponse.Error(500, nil, NSError(domain: "localhost", code: 500, userInfo: ["reason": "unreacheable code"])))
+>>>>>>> upstream/master
             }
         }
     }

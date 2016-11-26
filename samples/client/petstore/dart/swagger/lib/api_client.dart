@@ -17,37 +17,18 @@ class ApiClient {
 
   final dson = new Dartson.JSON()
                    ..addTransformer(new DateTimeParser(), DateTime);
-  final DateFormat _dateFormatter = new DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   final _RegList = new RegExp(r'^List<(.*)>$');
   final _RegMap = new RegExp(r'^Map<String,(.*)>$');
 
   ApiClient({this.basePath: "http://petstore.swagger.io/v2"}) {
     // Setup authentications (key: authentication name, value: authentication).
-    _authentications['petstore_auth'] = new OAuth();
     _authentications['api_key'] = new ApiKeyAuth("header", "api_key");
+    _authentications['petstore_auth'] = new OAuth();
   }
 
   void addDefaultHeader(String key, String value) {
      _defaultHeaderMap[key] = value;
-  }
-
-  /// Format the given Date object into string.
-  String formatDate(DateTime date) {
-    return _dateFormatter.format(date);
-  }
-
-  /// Format the given parameter object into string.
-  String parameterToString(Object param) {
-    if (param == null) {
-      return '';
-    } else if (param is DateTime) {
-      return formatDate(param);
-    } else if (param is List) {
-      return (param).join(',');
-    } else {
-      return param.toString();
-    }
   }
 
   dynamic _deserialize(dynamic value, String targetType) {

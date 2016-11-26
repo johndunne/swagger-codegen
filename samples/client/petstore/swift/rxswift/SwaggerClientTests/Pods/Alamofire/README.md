@@ -1,6 +1,10 @@
 ![Alamofire: Elegant Networking in Swift](https://raw.githubusercontent.com/Alamofire/Alamofire/assets/alamofire.png)
 
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/Alamofire/Alamofire.svg?branch=master)](https://travis-ci.org/Alamofire/Alamofire)
+=======
+[![Build Status](https://travis-ci.org/Alamofire/Alamofire.svg)](https://travis-ci.org/Alamofire/Alamofire)
+>>>>>>> upstream/master
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Alamofire.svg)](https://img.shields.io/cocoapods/v/Alamofire.svg)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Platform](https://img.shields.io/cocoapods/p/Alamofire.svg?style=flat)](http://cocoadocs.org/docsets/Alamofire)
@@ -50,6 +54,7 @@ Alamofire is an HTTP networking library written in Swift.
 
 In order to keep Alamofire focused specifically on core networking implementations, additional component libraries have been created by the [Alamofire Software Foundation](https://github.com/Alamofire/Foundation) to bring additional functionality to the Alamofire ecosystem.
 
+<<<<<<< HEAD
 - [AlamofireImage](https://github.com/Alamofire/AlamofireImage) - An image library including image response serializers, `UIImage` and `UIImageView` extensions, custom image filters, an auto-purging in-memory cache and a priority-based image downloading system.
 - [AlamofireNetworkActivityIndicator](https://github.com/Alamofire/AlamofireNetworkActivityIndicator) - Controls the visibility of the network activity indicator on iOS using Alamofire. It contains configurable delay timers to help mitigate flicker and can support `URLSession` instances not managed by Alamofire.
 
@@ -58,6 +63,15 @@ In order to keep Alamofire focused specifically on core networking implementatio
 - iOS 9.0+ / Mac OS X 10.11+ / tvOS 9.0+ / watchOS 2.0+
 - Xcode 8.0+
 - Swift 3.0+
+=======
+* [AlamofireImage](https://github.com/Alamofire/AlamofireImage) - An image library including image response serializers, `UIImage` and `UIImageView` extensions, custom image filters, an auto-purging in-memory cache and a priority-based image downloading system.
+* [AlamofireNetworkActivityIndicator](https://github.com/Alamofire/AlamofireNetworkActivityIndicator) - Controls the visibility of the network activity indicator on iOS using Alamofire. It contains configurable delay timers to help mitigate flicker and can support `NSURLSession` instances not managed by Alamofire.
+
+## Requirements
+
+- iOS 8.0+ / Mac OS X 10.9+ / tvOS 9.0+ / watchOS 2.0+
+- Xcode 7.3+
+>>>>>>> upstream/master
 
 ## Migration Guides
 
@@ -89,11 +103,19 @@ To integrate Alamofire into your Xcode project using CocoaPods, specify it in yo
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
+<<<<<<< HEAD
 platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
     pod 'Alamofire', '~> 4.0'
+=======
+platform :ios, '9.0'
+use_frameworks!
+
+target '<Your Target Name>' do
+    pod 'Alamofire', '~> 3.4'
+>>>>>>> upstream/master
 end
 ```
 
@@ -117,7 +139,11 @@ $ brew install carthage
 To integrate Alamofire into your Xcode project using Carthage, specify it in your `Cartfile`:
 
 ```ogdl
+<<<<<<< HEAD
 github "Alamofire/Alamofire" ~> 4.0
+=======
+github "Alamofire/Alamofire" ~> 3.4
+>>>>>>> upstream/master
 ```
 
 Run `carthage update` to build the framework and drag the built `Alamofire.framework` into your Xcode project.
@@ -150,8 +176,8 @@ $ git submodule add https://github.com/Alamofire/Alamofire.git
 - Click on the `+` button under the "Embedded Binaries" section.
 - You will see two different `Alamofire.xcodeproj` folders each with two different versions of the `Alamofire.framework` nested inside a `Products` folder.
 
-    > It does not matter which `Products` folder you choose from, but it does matter whether you choose the top or bottom `Alamofire.framework`.
-
+    > It does not matter which `Products` folder you choose from, but it does matter whether you choose the top or bottom `Alamofire.framework`. 
+    
 - Select the top `Alamofire.framework` for iOS and the bottom one for OS X.
 
     > You can verify which one you selected by inspecting the build log for your project. The build target for `Alamofire` will be listed as either `Alamofire iOS`, `Alamofire macOS`, `Alamofire tvOS` or `Alamofire watchOS`.
@@ -195,6 +221,7 @@ In the above example, the `responseJSON` handler is appended to the `Request` to
 
 Alamofire contains five different response handlers by default including:
 
+<<<<<<< HEAD
 ```swift
 // Response Handler - Unserialized Response
 func response(
@@ -227,6 +254,41 @@ func responsePropertyList(
     completionHandler: @escaping (DataResponse<Any>) -> Void))
     -> Self
 ```
+=======
+### Validation
+
+By default, Alamofire treats any completed request to be successful, regardless of the content of the response. Calling `validate` before a response handler causes an error to be generated if the response had an unacceptable status code or MIME type.
+
+#### Manual Validation
+
+```swift
+Alamofire.request(.GET, "https://httpbin.org/get", parameters: ["foo": "bar"])
+         .validate(statusCode: 200..<300)
+         .validate(contentType: ["application/json"])
+         .response { response in
+             print(response)
+         }
+```
+
+#### Automatic Validation
+
+Automatically validates status code within `200...299` range, and that the `Content-Type` header of the response matches the `Accept` header of the request, if one is provided.
+
+```swift
+Alamofire.request(.GET, "https://httpbin.org/get", parameters: ["foo": "bar"])
+         .validate()
+         .responseJSON { response in
+             switch response.result {
+             case .Success:
+                 print("Validation Successful")
+             case .Failure(let error):
+                 print(error)
+             }
+         }
+```
+
+### Response Serialization
+>>>>>>> upstream/master
 
 None of the response handlers perform any validation of the `HTTPURLResponse` it gets back from the server.
 
@@ -237,6 +299,7 @@ None of the response handlers perform any validation of the `HTTPURLResponse` it
 The `response` handler does NOT evaluate any of the response data. It merely forwards on all information directly from the URL session delegate. It is the Alamofire equivalent of using `cURL` to execute a `Request`.
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request("https://httpbin.org/get").response { response in
     print("Request: \(response.request)")
     print("Response: \(response.response)")
@@ -249,12 +312,26 @@ Alamofire.request("https://httpbin.org/get").response { response in
 ```
 
 > We strongly encourage you to leverage the other response serializers taking advantage of `Response` and `Result` types.
+=======
+Alamofire.request(.GET, "https://httpbin.org/get", parameters: ["foo": "bar"])
+         .validate()
+         .response { request, response, data, error in
+             print(request)
+             print(response)
+             print(data)
+             print(error)
+          }
+```
+
+> The `response` serializer does NOT evaluate any of the response data. It merely forwards on all the information directly from the URL session delegate. We strongly encourage you to leverage the other response serializers taking advantage of `Response` and `Result` types.
+>>>>>>> upstream/master
 
 #### Response Data Handler
 
 The `responseData` handler uses the `responseDataSerializer` (the object that serializes the server data into some other type) to extract the `Data` returned by the server. If no errors occur and `Data` is returned, the response `Result` will be a `.success` and the `value` will be of type `Data`.
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request("https://httpbin.org/get").responseData { response in
     debugPrint("All Response Info: \(response)")
 
@@ -262,6 +339,15 @@ Alamofire.request("https://httpbin.org/get").responseData { response in
     	print("Data: \(utf8Text)")
     }
 }
+=======
+Alamofire.request(.GET, "https://httpbin.org/get", parameters: ["foo": "bar"])
+         .validate()
+         .responseData { response in
+             print(response.request)
+             print(response.response)
+             print(response.result)
+          }
+>>>>>>> upstream/master
 ```
 
 #### Response String Handler
@@ -269,10 +355,19 @@ Alamofire.request("https://httpbin.org/get").responseData { response in
 The `responseString` handler uses the `responseStringSerializer` to convert the `Data` returned by the server into a `String` with the specified encoding. If no errors occur and the server data is successfully serialized into a `String`, the response `Result` will be a `.success` and the `value` will be of type `String`.
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request("https://httpbin.org/get").responseString { response in
     print("Success: \(response.result.isSuccess)")
     print("Response String: \(response.result.value)")
 }
+=======
+Alamofire.request(.GET, "https://httpbin.org/get")
+         .validate()
+         .responseString { response in
+             print("Success: \(response.result.isSuccess)")
+             print("Response String: \(response.result.value)")
+         }
+>>>>>>> upstream/master
 ```
 
 > If no encoding is specified, Alamofire will use the text encoding specified in the `HTTPURLResponse` from the server. If the text encoding cannot be determined by the server response, it defaults to `.isoLatin1`.
@@ -282,6 +377,7 @@ Alamofire.request("https://httpbin.org/get").responseString { response in
 The `responseJSON` handler uses the `responseJSONSerializer` to convert the `Data` returned by the server into an `Any` type using the specified `JSONSerialization.ReadingOptions`. If no errors occur and the server data is successfully serialized into a JSON object, the response `Result` will be a `.success` and the `value` will be of type `Any`.
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request("https://httpbin.org/get").responseJSON { response in
     debugPrint(response)
 
@@ -289,6 +385,13 @@ Alamofire.request("https://httpbin.org/get").responseJSON { response in
         print("JSON: \(json)")
     }
 }
+=======
+Alamofire.request(.GET, "https://httpbin.org/get")
+         .validate()
+         .responseJSON { response in
+             debugPrint(response)
+         }
+>>>>>>> upstream/master
 ```
 
 > All JSON serialization is handled by the `JSONSerialization` API in the `Foundation` framework.
@@ -298,6 +401,7 @@ Alamofire.request("https://httpbin.org/get").responseJSON { response in
 Response handlers can even be chained:
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request("https://httpbin.org/get")
     .responseString { response in
         print("Response String: \(response.result.value)")
@@ -305,6 +409,16 @@ Alamofire.request("https://httpbin.org/get")
     .responseJSON { response in
         print("Response JSON: \(response.result.value)")
     }
+=======
+Alamofire.request(.GET, "https://httpbin.org/get")
+         .validate()
+         .responseString { response in
+             print("Response String: \(response.result.value)")
+         }
+         .responseJSON { response in
+             print("Response JSON: \(response.result.value)")
+         }
+>>>>>>> upstream/master
 ```
 
 > It is important to note that using multiple response handlers on the same `Request` requires the server data to be serialized multiple times. Once for each response handler.
@@ -564,6 +678,7 @@ let password = "password"
 
 var headers: HTTPHeaders = [:]
 
+<<<<<<< HEAD
 if let authorizationHeader = Request.authorizationHeader(user: user, password: password) {
     headers[authorizationHeader.key] = authorizationHeader.value
 }
@@ -572,11 +687,24 @@ Alamofire.request("https://httpbin.org/basic-auth/user/password", headers: heade
     .responseJSON { response in
         debugPrint(response)
     }
+=======
+             // This closure is NOT called on the main queue for performance
+             // reasons. To update your ui, dispatch to the main queue.
+             dispatch_async(dispatch_get_main_queue()) {
+                 print("Total bytes written on main queue: \(totalBytesWritten)")
+             }
+         }
+         .validate()
+         .responseJSON { response in
+             debugPrint(response)
+         }
+>>>>>>> upstream/master
 ```
 
 #### Authentication with URLCredential
 
 ```swift
+<<<<<<< HEAD
 let user = "user"
 let password = "password"
 
@@ -586,6 +714,24 @@ Alamofire.request("https://httpbin.org/basic-auth/\(user)/\(password)")
     .authenticate(usingCredential: credential)
     .responseJSON { response in
         debugPrint(response)
+=======
+Alamofire.upload(
+    .POST,
+    "https://httpbin.org/post",
+    multipartFormData: { multipartFormData in
+        multipartFormData.appendBodyPart(fileURL: unicornImageURL, name: "unicorn")
+        multipartFormData.appendBodyPart(fileURL: rainbowImageURL, name: "rainbow")
+    },
+    encodingCompletion: { encodingResult in
+    	switch encodingResult {
+    	case .Success(let upload, _, _):
+            upload.responseJSON { response in
+                debugPrint(response)
+            }
+    	case .Failure(let encodingError):
+    	    print(encodingError)
+    	}
+>>>>>>> upstream/master
     }
 ```
 
@@ -786,6 +932,7 @@ Alamofire.request("https://httpbin.org/get").responseJSON { response in
 }
 ```
 
+<<<<<<< HEAD
 The above reports the following `Timeline` info:
 
 - `Latency`: 0.428 seconds
@@ -818,6 +965,28 @@ Alamofire.request("https://httpbin.org/get").responseJSON { response in
 Debugging platform issues can be frustrating. Thankfully, Alamofire `Request` objects conform to both the `CustomStringConvertible` and `CustomDebugStringConvertible` protocols to provide some VERY helpful debugging tools.
 
 #### CustomStringConvertible
+=======
+### Timeline
+
+Alamofire collects timings throughout the lifecycle of a `Request` and creates a `Timeline` object exposed as a property on a `Response`.
+
+```swift
+Alamofire.request(.GET, "https://httpbin.org/get", parameters: ["foo": "bar"])
+         .validate()
+         .responseJSON { response in
+             print(response.timeline)
+         }
+```
+
+The above reports the following `Timeline` info:
+
+- `Latency`: 0.428 seconds
+- `Request Duration`: 0.428 seconds
+- `Serialization Duration`: 0.001 seconds
+- `Total Duration`: 0.429 seconds
+
+### Printable
+>>>>>>> upstream/master
 
 ```swift
 let request = Alamofire.request("https://httpbin.org/ip")
@@ -923,8 +1092,26 @@ open var sessionDidReceiveChallenge: ((URLSession, URLAuthenticationChallenge) -
 /// Overrides default behavior for URLSessionDelegate method `urlSessionDidFinishEvents(forBackgroundURLSession:)`.
 open var sessionDidFinishEventsForBackgroundURLSession: ((URLSession) -> Void)?
 
+<<<<<<< HEAD
 /// Overrides default behavior for URLSessionTaskDelegate method `urlSession(_:task:willPerformHTTPRedirection:newRequest:completionHandler:)`.
 open var taskWillPerformHTTPRedirection: ((URLSession, URLSessionTask, HTTPURLResponse, URLRequest) -> URLRequest?)?
+=======
+#### Handling Errors
+
+Before implementing custom response serializers or object serialization methods, it's important to be prepared to handle any errors that may occur. Alamofire recommends handling these through the use of either your own `NSError` creation methods, or a simple `enum` that conforms to `ErrorType`. For example, this `BackendError` type, which will be used in later examples:
+
+```swift
+public enum BackendError: ErrorType {
+    case Network(error: NSError)
+    case DataSerialization(reason: String)
+    case JSONSerialization(error: NSError)
+    case ObjectSerialization(reason: String)
+    case XMLSerialization(error: NSError)
+}
+```
+
+#### Creating a Custom Response Serializer
+>>>>>>> upstream/master
 
 /// Overrides default behavior for URLSessionDataDelegate method `urlSession(_:dataTask:willCacheResponse:completionHandler:)`.
 open var dataTaskWillCacheResponse: ((URLSession, URLSessionDataTask, CachedURLResponse) -> CachedURLResponse?)?
@@ -933,6 +1120,7 @@ open var dataTaskWillCacheResponse: ((URLSession, URLSessionDataTask, CachedURLR
 The following is a short example of how to use the `taskWillPerformHTTPRedirection` to avoid following redirects to any `apple.com` domains.
 
 ```swift
+<<<<<<< HEAD
 let sessionManager = Alamofire.SessionManager(configuration: URLSessionConfiguration.default)
 let delegate: Alamofire.SessionDelegate = sessionManager.delegate
 
@@ -948,6 +1136,29 @@ delegate.taskWillPerformHTTPRedirection = { session, task, response, request in
     }
 
     return finalRequest
+=======
+extension Request {
+    public static func XMLResponseSerializer() -> ResponseSerializer<ONOXMLDocument, BackendError> {
+        return ResponseSerializer { request, response, data, error in
+            guard error == nil else { return .Failure(.Network(error: error!)) }
+
+            guard let validData = data else {
+                return .Failure(.DataSerialization(reason: "Data could not be serialized. Input data was nil."))
+            }
+
+            do {
+                let XML = try ONOXMLDocument(data: validData)
+                return .Success(XML)
+            } catch {
+                return .Failure(.XMLSerialization(error: error as NSError))
+            }
+        }
+    }
+
+    public func responseXMLDocument(completionHandler: Response<ONOXMLDocument, BackendError> -> Void) -> Self {
+        return response(responseSerializer: Request.XMLResponseSerializer(), completionHandler: completionHandler)
+    }
+>>>>>>> upstream/master
 }
 ```
 
@@ -977,7 +1188,32 @@ class LoggingSessionDelegate: SessionDelegate {
 }
 ```
 
+<<<<<<< HEAD
 Generally speaking, either the default implementation or the override closures should provide the necessary functionality required. Subclassing should only be used as a last resort.
+=======
+extension Request {
+    public func responseObject<T: ResponseObjectSerializable>(completionHandler: Response<T, BackendError> -> Void) -> Self {
+        let responseSerializer = ResponseSerializer<T, BackendError> { request, response, data, error in
+            guard error == nil else { return .Failure(.Network(error: error!)) }
+
+            let JSONResponseSerializer = Request.JSONResponseSerializer(options: .AllowFragments)
+            let result = JSONResponseSerializer.serializeResponse(request, response, data, error)
+
+            switch result {
+            case .Success(let value):
+                if let
+                    response = response,
+                    responseObject = T(response: response, representation: value)
+                {
+                    return .Success(responseObject)
+                } else {
+                    return .Failure(.ObjectSerialization(reason: "JSON could not be serialized into response object: \(value)"))
+                }
+            case .Failure(let error):
+                return .Failure(.JSONSerialization(error: error))
+            }
+        }
+>>>>>>> upstream/master
 
 > It is important to keep in mind that the `subdelegates` are initialized and destroyed in the default implementation. Be careful when subclassing to not introduce memory leaks.
 
@@ -1028,8 +1264,15 @@ extension User: URLConvertible {
 ```
 
 ```swift
+<<<<<<< HEAD
 let user = User(username: "mattt")
 Alamofire.request(user) // https://example.com/users/mattt
+=======
+Alamofire.request(.GET, "https://example.com/users/mattt")
+         .responseObject { (response: Response<User, BackendError>) in
+             debugPrint(response)
+         }
+>>>>>>> upstream/master
 ```
 
 #### URLRequestConvertible
@@ -1049,11 +1292,35 @@ do {
     // No-op
 }
 
+<<<<<<< HEAD
 urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+=======
+extension ResponseCollectionSerializable where Self: ResponseObjectSerializable {
+    static func collection(response response: NSHTTPURLResponse, representation: AnyObject) -> [Self] {
+        var collection = [Self]()
+        
+        if let representation = representation as? [[String: AnyObject]] {
+            for itemRepresentation in representation {
+                if let item = Self(response: response, representation: itemRepresentation) {
+                    collection.append(item)
+                }
+            }
+        }
+        
+        return collection
+    }
+}
+
+extension Alamofire.Request {
+    public func responseCollection<T: ResponseCollectionSerializable>(completionHandler: Response<[T], BackendError> -> Void) -> Self {
+        let responseSerializer = ResponseSerializer<[T], BackendError> { request, response, data, error in
+            guard error == nil else { return .Failure(.Network(error: error!)) }
+>>>>>>> upstream/master
 
 Alamofire.request(urlRequest)
 ```
 
+<<<<<<< HEAD
 Applications interacting with web applications in a significant manner are encouraged to have custom types conform to `URLRequestConvertible` as a way to ensure consistency of requested endpoints. Such an approach can be used to abstract away server-side inconsistencies and provide type-safe routing, as well as manage authentication credentials and other state.
 
 ##### API Parameter Abstraction
@@ -1074,6 +1341,17 @@ enum Router: URLRequestConvertible {
                 return ("/search", ["q": query, "offset": Router.perPage * page])
             case let .search(query, _):
                 return ("/search", ["q": query])
+=======
+            switch result {
+            case .Success(let value):
+                if let response = response {
+                    return .Success(T.collection(response: response, representation: value))
+                } else {
+                    return .Failure(. ObjectSerialization(reason: "Response collection could not be serialized due to nil response"))
+                }
+            case .Failure(let error):
+                return .Failure(.JSONSerialization(error: error))
+>>>>>>> upstream/master
             }
         }()
 
@@ -1127,6 +1405,7 @@ enum Router: URLRequestConvertible {
             return "/users/\(username)"
         }
     }
+<<<<<<< HEAD
 
     // MARK: URLRequestConvertible
 
@@ -1147,11 +1426,20 @@ enum Router: URLRequestConvertible {
 
         return urlRequest
     }
+=======
+>>>>>>> upstream/master
 }
 ```
 
 ```swift
+<<<<<<< HEAD
 Alamofire.request(Router.readUser("mattt")) // GET /users/mattt
+=======
+Alamofire.request(.GET, "http://example.com/users")
+         .responseCollection { (response: Response<[User], BackendError>) in
+             debugPrint(response)
+         }
+>>>>>>> upstream/master
 ```
 
 ### Adapting and Retrying Requests
@@ -1393,6 +1681,7 @@ extension DataRequest {
 }
 ```
 
+<<<<<<< HEAD
 #### Generic Response Object Serialization
 
 Generics can be used to provide automatic, type-safe response object serialization.
@@ -1416,6 +1705,15 @@ extension DataRequest {
             
             guard case let .success(jsonObject) = result else {
                 return .failure(BackendError.jsonSerialization(error: result.error!))
+=======
+    var URLRequest: NSMutableURLRequest {
+        let result: (path: String, parameters: [String: AnyObject]) = {
+            switch self {
+            case .Search(let query, let page) where page > 0:
+                return ("/search", ["q": query, "offset": Router.perPage * page])
+            case .Search(let query, _):
+                return ("/search", ["q": query])
+>>>>>>> upstream/master
             }
 
             guard let response = response, let responseObject = T(response: response, representation: jsonObject) else {
@@ -1548,6 +1846,74 @@ Alamofire.request("https://example.com/users").responseCollection { (response: D
 }
 ```
 
+### SessionDelegate
+
+By default, an Alamofire `Manager` instance creates an internal `SessionDelegate` object to handle all the various types of delegate callbacks that are generated by the underlying `NSURLSession`. The implementations of each delegate method handle the most common use cases for these types of calls abstracting the complexity away from the top-level APIs. However, advanced users may find the need to override the default functionality for various reasons.
+
+#### Override Closures
+
+The first way to customize the `SessionDelegate` behavior is through the use of the override closures. Each closure gives you the ability to override the implementation of the matching `SessionDelegate` API, yet still use the default implementation for all other APIs. This makes it easy to customize subsets of the delegate functionality. Here are a few examples of some of the override closures available:
+
+```swift
+/// Overrides default behavior for NSURLSessionDelegate method `URLSession:didReceiveChallenge:completionHandler:`.
+public var sessionDidReceiveChallenge: ((NSURLSession, NSURLAuthenticationChallenge) -> (NSURLSessionAuthChallengeDisposition, NSURLCredential?))?
+
+/// Overrides default behavior for NSURLSessionDelegate method `URLSessionDidFinishEventsForBackgroundURLSession:`.
+public var sessionDidFinishEventsForBackgroundURLSession: ((NSURLSession) -> Void)?
+
+/// Overrides default behavior for NSURLSessionTaskDelegate method `URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:`.
+public var taskWillPerformHTTPRedirection: ((NSURLSession, NSURLSessionTask, NSHTTPURLResponse, NSURLRequest) -> NSURLRequest?)?
+
+/// Overrides default behavior for NSURLSessionDataDelegate method `URLSession:dataTask:willCacheResponse:completionHandler:`.
+public var dataTaskWillCacheResponse: ((NSURLSession, NSURLSessionDataTask, NSCachedURLResponse) -> NSCachedURLResponse?)?
+```
+
+The following is a short example of how to use the `taskWillPerformHTTPRedirection` to avoid following redirects to any `apple.com` domains.
+
+```swift
+let delegate: Alamofire.Manager.SessionDelegate = manager.delegate
+
+delegate.taskWillPerformHTTPRedirection = { session, task, response, request in
+    var finalRequest = request
+
+    if let originalRequest = task.originalRequest where originalRequest.URLString.containsString("apple.com") {
+		finalRequest = originalRequest
+	}
+
+	return finalRequest
+}
+```
+
+#### Subclassing
+
+Another way to override the default implementation of the `SessionDelegate` is to subclass it. Subclassing allows you completely customize the behavior of the API or to create a proxy for the API and still use the default implementation. Creating a proxy allows you to log events, emit notifications, provide pre and post hook implementations, etc. Here's a quick example of subclassing the `SessionDelegate` and logging a message when a redirect occurs.
+
+```swift
+class LoggingSessionDelegate: Manager.SessionDelegate {
+    override func URLSession(
+        session: NSURLSession,
+        task: NSURLSessionTask,
+        willPerformHTTPRedirection response: NSHTTPURLResponse,
+        newRequest request: NSURLRequest,
+        completionHandler: NSURLRequest? -> Void)
+    {
+        print("URLSession will perform HTTP redirection to request: \(request)")
+
+        super.URLSession(
+            session,
+            task: task,
+            willPerformHTTPRedirection: response,
+            newRequest: request,
+            completionHandler: completionHandler
+        )
+    }
+}
+```
+
+Generally, either the default implementation or the override closures should provide the necessary functionality required. Subclassing should only be used as a last resort.
+
+> It is important to keep in mind that the `subdelegates` are initialized and destroyed in the default implementation. Be careful when subclassing to not introduce memory leaks.
+
 ### Security
 
 Using a secure HTTPS connection when communicating with servers and web services is an important step in securing sensitive data. By default, Alamofire will evaluate the certificate chain provided by the server using Apple's built in validation provided by the Security framework. While this guarantees the certificate chain is valid, it does not prevent man-in-the-middle (MITM) attacks or other potential vulnerabilities. In order to mitigate MITM attacks, applications dealing with sensitive customer data or financial information should use certificate or public key pinning provided by the `ServerTrustPolicy`.
@@ -1566,15 +1932,23 @@ let serverTrustPolicy = ServerTrustPolicy.pinCertificates(
 
 There are many different cases of server trust evaluation giving you complete control over the validation process:
 
+<<<<<<< HEAD
 * `performDefaultEvaluation`: Uses the default server trust evaluation while allowing you to control whether to validate the host provided by the challenge.
 * `pinCertificates`: Uses the pinned certificates to validate the server trust. The server trust is considered valid if one of the pinned certificates match one of the server certificates.
 * `pinPublicKeys`: Uses the pinned public keys to validate the server trust. The server trust is considered valid if one of the pinned public keys match one of the server certificate public keys.
 * `disableEvaluation`: Disables all evaluation which in turn will always consider any server trust as valid.
 * `customEvaluation`: Uses the associated closure to evaluate the validity of the server trust thus giving you complete control over the validation process. Use with caution.
+=======
+* `PerformDefaultEvaluation`: Uses the default server trust evaluation while allowing you to control whether to validate the host provided by the challenge. 
+* `PinCertificates`: Uses the pinned certificates to validate the server trust. The server trust is considered valid if one of the pinned certificates match one of the server certificates.
+* `PinPublicKeys`: Uses the pinned public keys to validate the server trust. The server trust is considered valid if one of the pinned public keys match one of the server certificate public keys.
+* `DisableEvaluation`: Disables all evaluation which in turn will always consider any server trust as valid.
+* `CustomEvaluation`: Uses the associated closure to evaluate the validity of the server trust thus giving you complete control over the validation process. Use with caution.
+>>>>>>> upstream/master
 
 #### Server Trust Policy Manager
 
-The `ServerTrustPolicyManager` is responsible for storing an internal mapping of server trust policies to a particular host. This allows Alamofire to evaluate each host against a different server trust policy.
+The `ServerTrustPolicyManager` is responsible for storing an internal mapping of server trust policies to a particular host. This allows Alamofire to evaluate each host against a different server trust policy. 
 
 ```swift
 let serverTrustPolicies: [String: ServerTrustPolicy] = [
@@ -1671,11 +2045,19 @@ The `NetworkReachabilityManager` listens for reachability changes of hosts and a
 
 ```swift
 let manager = NetworkReachabilityManager(host: "www.apple.com")
+<<<<<<< HEAD
 
 manager?.listener = { status in
     print("Network Status Changed: \(status)")
 }
 
+=======
+
+manager?.listener = { status in
+    print("Network Status Changed: \(status)")
+}
+
+>>>>>>> upstream/master
 manager?.startListening()
 ```
 
@@ -1683,12 +2065,25 @@ manager?.startListening()
 
 There are some important things to remember when using network reachability to determine what to do next.
 
+<<<<<<< HEAD
 - **Do NOT** use Reachability to determine if a network request should be sent.
     - You should **ALWAYS** send it.
 - When Reachability is restored, use the event to retry failed network requests.
     - Even though the network requests may still fail, this is a good moment to retry them.
 - The network reachability status can be useful for determining why a network request may have failed.
     - If a network request fails, it is more useful to tell the user that the network request failed due to being offline rather than a more technical error, such as "request timed out."
+=======
+* **Do NOT** use Reachability to determine if a network request should be sent.
+  * You should **ALWAYS** send it.
+* When Reachability is restored, use the event to retry failed network requests.
+  * Even though the network requests may still fail, this is a good moment to retry them.
+* The network reachability status can be useful for determining why a network request may have failed.
+  * If a network request fails, it is more useful to tell the user that the network request failed due to being offline rather than a more technical error, such as "request timed out."
+
+> It is recommended to check out [WWDC 2012 Session 706, "Networking Best Practices"](https://developer.apple.com/videos/play/wwdc2012-706/) for more info.
+
+---
+>>>>>>> upstream/master
 
 > It is recommended to check out [WWDC 2012 Session 706, "Networking Best Practices"](https://developer.apple.com/videos/play/wwdc2012-706/) for more info.
 
@@ -1696,12 +2091,17 @@ There are some important things to remember when using network reachability to d
 
 ## Open Radars
 
+<<<<<<< HEAD
 The following radars have some affect on the current implementation of Alamofire.
 
 - [`rdar://21349340`](http://www.openradar.me/radar?id=5517037090635776) - Compiler throwing warning due to toll-free bridging issue in test case
 - [`rdar://26761490`](http://www.openradar.me/radar?id=5010235949318144) - Swift string interpolation causing memory leak with common usage
 - `rdar://26870455` - Background URL Session Configurations do not work in the simulator
 - `rdar://26849668` - Some URLProtocol APIs do not properly handle `URLRequest`
+=======
+* [rdar://21349340](http://www.openradar.me/radar?id=5517037090635776) - Compiler throwing warning due to toll-free bridging issue in test case
+* [rdar://26761490](http://www.openradar.me/radar?id=5010235949318144) - Swift string interpolation causing memory leak with common usage
+>>>>>>> upstream/master
 
 ## FAQ
 
@@ -1729,11 +2129,19 @@ If you believe you have identified a security vulnerability with Alamofire, you 
 
 The [ASF](https://github.com/Alamofire/Foundation#members) is looking to raise money to officially register as a federal non-profit organization. Registering will allow us members to gain some legal protections and also allow us to put donations to use, tax free. Donating to the ASF will enable us to:
 
+<<<<<<< HEAD
 - Pay our legal fees to register as a federal non-profit organization
 - Pay our yearly legal fees to keep the non-profit in good status
 - Pay for our mail servers to help us stay on top of all questions and security issues
 - Potentially fund test servers to make it easier for us to test the edge cases
 - Potentially fund developers to work on one of our projects full-time
+=======
+* Pay our legal fees to register as a federal non-profit organization
+* Pay our yearly legal fees to keep the non-profit in good status
+* Pay for our mail servers to help us stay on top of all questions and security issues
+* Potentially fund test servers to make it easier for us to test the edge cases
+* Potentially fund developers to work on one of our projects full-time
+>>>>>>> upstream/master
 
 The community adoption of the ASF libraries has been amazing. We are greatly humbled by your enthusiam around the projects, and want to continue to do everything we can to move the needle forward. With your continued support, the ASF will be able to improve its reach and also provide better legal safety for the core members. If you use any of our libraries for work, see if your employers would be interested in donating. Our initial goal is to raise $1000 to get all our legal ducks in a row and kickstart this campaign. Any amount you can donate today to help us reach our goal would be greatly appreciated.
 

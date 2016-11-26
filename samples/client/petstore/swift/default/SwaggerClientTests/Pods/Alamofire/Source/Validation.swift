@@ -28,7 +28,28 @@ extension Request {
 
     // MARK: Helper Types
 
+<<<<<<< HEAD
     fileprivate typealias ErrorReason = AFError.ResponseValidationFailureReason
+=======
+        - Success: The validation was successful.
+        - Failure: The validation failed encountering the provided error.
+    */
+    public enum ValidationResult {
+        case Success
+        case Failure(NSError)
+    }
+
+    /**
+        A closure used to validate a request that takes a URL request and URL response, and returns whether the
+        request was valid.
+    */
+    public typealias Validation = (NSURLRequest?, NSHTTPURLResponse) -> ValidationResult
+
+    /**
+        Validates the request, using the specified closure.
+
+        If validation fails, subsequent calls to response handlers will have an associated error.
+>>>>>>> upstream/master
 
     /// Used to represent whether validation was successful or encountered an error resulting in a failure.
     ///
@@ -79,8 +100,16 @@ extension Request {
             return accept.components(separatedBy: ",")
         }
 
+<<<<<<< HEAD
         return ["*/*"]
     }
+=======
+        - returns: The request.
+    */
+    public func validate<S: SequenceType where S.Generator.Element == String>(contentType acceptableContentTypes: S) -> Self {
+        return validate { _, response in
+            guard let validData = self.delegate.data where validData.length > 0 else { return .Success }
+>>>>>>> upstream/master
 
     // MARK: Status Code
 
@@ -174,8 +203,14 @@ extension DataRequest {
 
         validations.append(validationExecution)
 
+<<<<<<< HEAD
         return self
     }
+=======
+    /**
+        Validates that the response has a status code in the default acceptable range of 200...299, and that the content
+        type matches any specified in the Accept HTTP header field.
+>>>>>>> upstream/master
 
     /// Validates that the response has a status code in the specified sequence.
     ///

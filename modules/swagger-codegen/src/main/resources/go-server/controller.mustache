@@ -10,8 +10,9 @@ import (
     "net/http"
     "quickflickserver/{{handlers_package_name}}"
     "quickflickserver/helpers"
-{{#operations}}{{#operation}}{{#bodyParams}}{{#-last}}    "encoding/json" //{{/-last}}{{/bodyParams}}{{/operation}}{{/operations}}
-{{#operations}}{{#operation}}{{#bodyParams}}{{#-last}}    "quickflickserver/models" //{{/-last}}{{/bodyParams}}{{/operation}}{{/operations}}
+{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "encoding/json" //{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
+{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "quickflickserver/models" //ignore{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
+{{#operations}}{{#operation}}{{#vendorExtensions.x-cache-control-header}}   "strings" //{{/vendorExtensions.x-cache-control-header}}{{/operation}}{{/operations}}
 )
 
 // Worth reading if you're using Martini: http://present.go-steel-programmers.org/martini-talk/martini.slide#14
@@ -30,8 +31,9 @@ import (
     isKeyInQuery:{{isKeyInQuery}}, isKeyInHeader:{{isKeyInHeader}}
  * {{/authMethods}}
  */
-func {{operationId}}(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+func {{operationId}}(w http.ResponseWriter, r *http.Request) { {{#vendorExtensions.x-cache-control-header}}
+    w.Header().Add("Cache-Control", strings.Replace("{{vendorExtensions.x-cache-control-header}}",":","=",0) ){{/vendorExtensions.x-cache-control-header}}
+    w.Header().Set("Content-Type", "{{#produces}}{{{mediaType}}}{{#hasMore}}, {{/hasMore}}{{/produces}}{{^produces}}Not defined{{/produces}}; charset=UTF-8")
 {{#createOrUpdateOperation}}{{#bodyParams}}
     decoder := json.NewDecoder( r.Body )
     obj := models.{{#bodyParams}}{{baseType}}{{/bodyParams}}{}

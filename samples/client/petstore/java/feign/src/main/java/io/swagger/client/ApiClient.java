@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import feign.Feign;
 import feign.RequestInterceptor;
+import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
@@ -32,7 +33,7 @@ public class ApiClient {
     objectMapper = createObjectMapper();
     apiAuthorizations = new LinkedHashMap<String, RequestInterceptor>();
     feignBuilder = Feign.builder()
-                .encoder(new FormAwareEncoder(new JacksonEncoder(objectMapper)))
+                .encoder(new FormEncoder(new JacksonEncoder(objectMapper)))
                 .decoder(new JacksonDecoder(objectMapper))
                 .logger(new Slf4jLogger());
   }
@@ -132,6 +133,7 @@ public class ApiClient {
     objectMapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
     objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    objectMapper.setDateFormat(new RFC3339DateFormat());
     objectMapper.registerModule(new JodaModule());
     return objectMapper;
   }

@@ -10,6 +10,7 @@ protocol JSONEncodable {
     func encodeToJSON() -> Any
 }
 
+<<<<<<< HEAD
 public enum ErrorResponse : Error {
     case Error(Int, Data?, Error)
 }
@@ -18,6 +19,16 @@ open class Response<T> {
     open let statusCode: Int
     open let header: [String: String]
     open let body: T?
+=======
+public enum ErrorResponse : ErrorType {
+    case Error(Int, NSData?, ErrorType)
+}
+
+public class Response<T> {
+    public let statusCode: Int
+    public let header: [String: String]
+    public let body: T?
+>>>>>>> upstream/master
 
     public init(statusCode: Int, header: [String: String], body: T?) {
         self.statusCode = statusCode
@@ -25,7 +36,11 @@ open class Response<T> {
         self.body = body
     }
 
+<<<<<<< HEAD
     public convenience init(response: HTTPURLResponse, body: T?) {
+=======
+    public convenience init(response: NSHTTPURLResponse, body: T?) {
+>>>>>>> upstream/master
         let rawHeader = response.allHeaderFields
         var header = [String:String]()
         for (key, value) in rawHeader {
@@ -161,12 +176,21 @@ class Decoders {
             Decoders.addDecoder(clazz: Order.self) { (source: AnyObject) -> Order in
                 let sourceDictionary = source as! [AnyHashable: Any]
                 let instance = Order()
+<<<<<<< HEAD
                 instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
                 instance.petId = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["petId"] as AnyObject?)
                 instance.quantity = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["quantity"] as AnyObject?)
                 instance.shipDate = Decoders.decodeOptional(clazz: Date.self, source: sourceDictionary["shipDate"] as AnyObject?)
                 instance.status = Order.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
                 instance.complete = Decoders.decodeOptional(clazz: Bool.self, source: sourceDictionary["complete"] as AnyObject?)
+=======
+                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
+                instance.petId = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["petId"])
+                instance.quantity = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["quantity"])
+                instance.shipDate = Decoders.decodeOptional(clazz: NSDate.self, source: sourceDictionary["shipDate"])
+                instance.status = Order.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
+                instance.complete = Decoders.decodeOptional(clazz: Bool.self, source: sourceDictionary["complete"])
+>>>>>>> upstream/master
                 return instance
             }
 
@@ -179,11 +203,19 @@ class Decoders {
             Decoders.addDecoder(clazz: Pet.self) { (source: AnyObject) -> Pet in
                 let sourceDictionary = source as! [AnyHashable: Any]
                 let instance = Pet()
+<<<<<<< HEAD
                 instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
                 instance.category = Decoders.decodeOptional(clazz: Category.self, source: sourceDictionary["category"] as AnyObject?)
                 instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"] as AnyObject?)
                 instance.photoUrls = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["photoUrls"] as AnyObject?)
                 instance.tags = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["tags"] as AnyObject?)
+=======
+                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
+                instance.category = Decoders.decodeOptional(clazz: Category.self, source: sourceDictionary["category"])
+                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"])
+                instance.photoUrls = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["photoUrls"])
+                instance.tags = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["tags"])
+>>>>>>> upstream/master
                 instance.status = Pet.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
                 return instance
             }

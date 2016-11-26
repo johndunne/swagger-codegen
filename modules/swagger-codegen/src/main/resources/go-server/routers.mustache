@@ -107,7 +107,7 @@ var routes = Routes{
 		"{{operationId}}",
 		"{{httpMethod}}",
 		"{{basePathWithoutHost}}{{path}}",
-    {{#hasAuthMethods}}[]linkedHandler{ {{#authMethods}}{{#scopes}} apiauth.ApiAuth{{scope}} {{^-last}},{{/-last}}{{/scopes}}{{/authMethods}} },{{/hasAuthMethods}} {{^authMethods}}[]linkedHandler{},{{/authMethods}}
+    []linkedHandler{ {{#hasAuthMethods}}{{#authMethods}}{{#scopes}}  apiauth.ApiAuth{{scope}} {{^-last}},{{/-last}}{{/scopes}}{{/authMethods}} {{/hasAuthMethods}} },
         controllers.{{operationId}},
 	},
 {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
