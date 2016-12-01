@@ -32,13 +32,39 @@ type {{classname}} struct {
 
 
 {{#models}}{{#model}}
-func (obj *{{classname}}) Read(decoder *json.Decoder) error {
-{{#optionalVars}}/* {{nameInCamelCase}} = {{defaultValue}} */{{#defaultValue}}
-    obj.{{nameInCamelCase}} = {{#isString}}"{{defaultValue}}"{{/isString}}{{^isString}}{{defaultValue}}{{/isString}}{{/defaultValue}}
-{{/optionalVars}}
+//func (obj *{{classname}}) Read(data []byte  /*, updating bool */ ) error {
+//    byte_reader := bytes.NewReader(data)
+//    decoder := json.NewDecoder(byte_reader)
+
+func (obj *{{classname}}) Read(decoder *json.Decoder /*, updating bool */ ) error {
+{{#vars}}
+    {{#required}}//obj.{{nameInCamelCase}} = {{#isString}}"{{defaultValue}}"{{/isString}}{{^isString}}{{defaultValue}}{{/isString}}{{/required}}{{^required}}
+    //obj.{{nameInCamelCase}} = {{#isString}}""{{/isString}}{{^isString}}0{{/isString}}{{/required}}
+{{/vars}}
     if err := decoder.Decode(&obj); err != nil {
+        //byte_reader = bytes.NewReader(data)
+        //broken_decoder := json.NewDecoder(byte_reader)
+        //m:=make(map[string]interface{})
+        //if e:=broken_decoder.Decode(&m);e!=nil{
+        //    return e
+        //}else {
+{{#vars}}
+        //        if value, present := m["{{name}}"]; present {
+        //                expected_value := reflect.TypeOf(obj.{{nameInCamelCase}})
+        //                actual_value := reflect.TypeOf(value)
+        //                if expected_value != actual_value {
+        //                       fmt.Printf("The value '{{nameInCamelCase}}' failed validation. Expecting %s and got %s\n", expected_value, actual_value)
+        //                }
+        //       }
+{{/vars}}
+        //}
         return err
     }
+    // Check that the required values have been changed
+{{#vars}}{{#required}}
+    //if obj.{{nameInCamelCase}} == {{#isString}}"{{defaultValue}}"{{/isString}}{{^isString}}{{defaultValue}}{{/isString}}{
+    //    fmt.Println("The value of '{{nameInCamelCase}}' is required yet not provided.")
+    //}{{/required}}{{/vars}}
     return nil
 }
 

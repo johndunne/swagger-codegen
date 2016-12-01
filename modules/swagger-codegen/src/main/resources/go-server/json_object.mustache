@@ -127,12 +127,23 @@ func sendClientErrorEmptyBodyResult(w http.ResponseWriter, request *http.Request
 
 func SendClientJsonObject(w http.ResponseWriter, request *http.Request, http_code int, obj interface{}) {
     w.Header().Set("Content-Type", "application/json")
-    if response, new_object_err := json.Marshal(obj);new_object_err != nil {
-        w.WriteHeader(500)
-        w.Write(response)
-    } else {
-        w.WriteHeader(http_code)
-        w.Write(response)
+    if error_object, is_error :=  obj.(error); is_error {
+        // Might be {"Value":"string","Type":{},"Offset":10} which describes the json decoding error encountered
+        if response, new_object_err := json.Marshal(map[string]string{"error":error_object.Error()});new_object_err != nil {
+            w.WriteHeader(500)
+            w.Write(response)
+        } else {
+            w.WriteHeader(http_code)
+            w.Write(response)
+        }
+    }else{
+        if response, new_object_err := json.Marshal(obj);new_object_err != nil {
+            w.WriteHeader(500)
+            w.Write(response)
+        } else {
+            w.WriteHeader(http_code)
+            w.Write(response)
+        }
     }
 }
 
@@ -261,4 +272,47 @@ func MightHaveGetString(r *http.Request, param string) (string, bool) {
 	}else {
 		return menu_item_id_s, true
 	}
+}
+
+func SendClientHttpError(w http.ResponseWriter, request *http.Request, e error ) {
+    w.Header().Set("Content-Type", "application/json")
+    error_code := http.StatusInternalServerError
+    message:=""
+    if error_object, is_error :=  e.(HttpAPIError); is_error {
+        error_code = error_object.ErrorCode
+        message = error_object.ErrorMessage
+    }else{
+        message = e.Error()
+    }
+    if response, new_object_err := json.Marshal(map[string]string{"error":message});new_object_err != nil {
+        w.WriteHeader(500)
+        w.Write([]byte("Unknown error"))
+    } else {
+        w.WriteHeader(error_code)
+        w.Write(response)
+    }
+}
+
+
+var DefaultOffset = 0
+var DefaultLimit = 30
+
+func ExtractOffsetLimit(r *http.Request) (int, int, int, int) {
+    offset_s := r.URL.Query().Get("offset")
+    limit_s := r.URL.Query().Get("limit")
+    if len(limit_s) == 0 {
+        limit_s = strconv.Itoa(DefaultLimit)
+    }
+    limit, limiterr := strconv.Atoi(limit_s)
+    if limiterr != nil {
+        limit = DefaultLimit
+    }
+    if len(offset_s) == 0 {
+        offset_s = "0"
+    }
+    offset, offseterr := strconv.Atoi(offset_s)
+    if offseterr != nil {
+        offset = DefaultOffset
+    }
+    return offset, limit, 0, 0
 }

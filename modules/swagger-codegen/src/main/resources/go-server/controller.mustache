@@ -7,6 +7,7 @@ package controllers
 {{hasAuthMethods}}
 {{authMethods}}
 import (
+    "errors"
     "net/http"
     "quickflickserver/{{handlers_package_name}}"
     "quickflickserver/helpers"
@@ -35,14 +36,22 @@ func {{operationId}}(w http.ResponseWriter, r *http.Request) { {{#vendorExtensio
     w.Header().Add("Cache-Control", strings.Replace("{{vendorExtensions.x-cache-control-header}}",":","=",0) ){{/vendorExtensions.x-cache-control-header}}
     w.Header().Set("Content-Type", "{{#produces}}{{{mediaType}}}{{#hasMore}}, {{/hasMore}}{{/produces}}{{^produces}}Not defined{{/produces}}; charset=UTF-8")
 {{#createOrUpdateOperation}}{{#bodyParams}}
+    //var b []bytes
+    //var err error
+    //if b, err = ioutil.ReadAll(r.Body); err != nil {
+    //    panic(err)
+    //}
     decoder := json.NewDecoder( r.Body )
+    //defer r.Body.Close()
     obj := models.{{#bodyParams}}{{baseType}}{{/bodyParams}}{}
+    //if decoder_error := (&obj).Read(b); decoder_error != nil {
     if decoder_error := (&obj).Read(decoder); decoder_error != nil {
         if aerr, ok := decoder_error.(*helpers.HttpAPIError); ok {
-           helpers.SendClientJsonObject( w, r, aerr.ErrorCode, decoder_error )
+           helpers.SendClientJsonObject( w, r, aerr.ErrorCode, aerr.ErrorMessage )
         } else {
             helpers.SendClientJsonObject( w, r, 500, decoder_error )
         }
+        return
     }
     {{#createOperation}}{{#uniqueItems_dont_work}}
         // doesn't work
@@ -72,7 +81,9 @@ func {{operationId}}(w http.ResponseWriter, r *http.Request) { {{#vendorExtensio
         }else{
             helpers.SendClientJsonObject( w, r, 500, err)
         }
-    }else{
+    }else if result == nil {
+        panic( errors.New("I can't send an empty body") )
+    }else {
         helpers.SendClientJsonObject( w, r, error_code, result )
     }
 }
