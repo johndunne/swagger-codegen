@@ -274,6 +274,24 @@ func MightHaveGetString(r *http.Request, param string) (string, bool) {
 	}
 }
 
+func MightHaveGetCSVInts(r *http.Request, param string) ([]int64, bool, error) {
+        parts := make([]int64,0)
+        if p, present := MightHaveGetString(r,param);present{
+                split := strings.Split(p,",")
+                for _, spl := range split{
+                        if group_id, group_conv_err := strconv.ParseInt(spl, 10, 0);group_conv_err != nil {
+                                return []int64{}, true, NewHttpAPIErrorBadRequest("Illegal integer: " + spl)
+                        }else {
+                                parts = append(parts, group_id)
+                        }
+                }
+                return parts, true, nil
+        }else{
+                return parts, false, nil
+        }
+}
+
+
 func SendClientHttpError(w http.ResponseWriter, request *http.Request, e error ) {
     w.Header().Set("Content-Type", "application/json")
     error_code := http.StatusInternalServerError
