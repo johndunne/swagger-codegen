@@ -33,7 +33,7 @@ import (
  * {{/authMethods}}
  */
 func {{operationId}}(w http.ResponseWriter, r *http.Request) { {{#vendorExtensions.x-cache-control-header}}
-    w.Header().Add("Cache-Control", strings.Replace("{{vendorExtensions.x-cache-control-header}}",":","=",0) ){{/vendorExtensions.x-cache-control-header}}
+    w.Header().Set("Cache-Control", strings.Replace("{{vendorExtensions.x-cache-control-header}}",":","=",4) ){{/vendorExtensions.x-cache-control-header}}
     w.Header().Set("Content-Type", "{{#produces}}{{{mediaType}}}{{#hasMore}}, {{/hasMore}}{{/produces}}{{^produces}}Not defined{{/produces}}; charset=UTF-8")
 {{#createOrUpdateOperation}}{{#bodyParams}}
     //var b []bytes
