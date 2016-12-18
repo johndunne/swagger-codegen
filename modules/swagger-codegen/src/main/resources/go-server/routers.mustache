@@ -75,6 +75,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 //    next(rw, r)
 //    // do some stuff after
 //}
+func AddRoute(route Route){
+    routes = append(routes,route)
+}
 
 var routes = Routes{
 	Route{
