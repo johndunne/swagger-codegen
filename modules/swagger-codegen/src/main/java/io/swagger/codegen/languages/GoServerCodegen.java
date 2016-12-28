@@ -18,8 +18,6 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
     protected String apiVersion = "1.0.0";
     protected int serverPort = 8080;
     protected String projectName = "swagger-server";
-    protected String apiPath = "src/quickflickserver/controllers";
-    protected String projectRoot = "src/quickflickserver";
 
     protected String PROJECT_NAME = "lah";
     protected String DB_DIALECT = "db_dialect";
@@ -32,6 +30,10 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
     protected String dbPassword = "password";
     protected String DB_NAME = "db_name";
     protected String dbName = "dbname";
+    protected String GO_PROJECT_NAME = "go_project_name";
+    protected String goProjectName = "ggffdd";
+    protected String apiPath = "src/" + goProjectName + "/controllers";
+    protected String projectRoot = "src/" + goProjectName;
     protected String USE_OAUTH = "use_oauth";
     protected boolean useOauth = true;
     protected String OAUTH_SECRET_KEY = "oauth_secret_key";
@@ -149,8 +151,9 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
         cliOptions.add(new CliOption(DB_BACKEND, "Which db should be used for the backend. gorm is currently available."));
         cliOptions.add(new CliOption(DB_USER, "The database username."));
         cliOptions.add(new CliOption(DB_PASSWORD, "The database password."));
+        cliOptions.add(new CliOption(GO_PROJECT_NAME, "The project name for the output source."));
         cliOptions.add(new CliOption(DB_NAME, "The database name to connect to."));
-        cliOptions.add(new CliOption(USE_OAUTH, "Use oauth.com for authorisation and authentcaiton?"));
+        cliOptions.add(new CliOption(USE_OAUTH, "Use oauth.com for authorisation and authentication?"));
         cliOptions.add(new CliOption(OAUTH_SECRET_KEY, "OAuth secret key"));
         /**
          * Additional Properties.  These values can be passed to the templates and
@@ -411,12 +414,30 @@ public class GoServerCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public void processOpts() {
         super.processOpts();
-
+        System.out.println("-----------------------------");
+        System.out.println("-----------------------------");
+        System.out.println("-----------------------------");
+        System.out.println(additionalProperties.toString());
+        System.out.println("-----------------------------");
+        System.out.println("-----------------------------");
+        System.out.println("-----------------------------");
         if( !additionalProperties.containsKey(DB_BACKEND) ){
             additionalProperties.put(DB_BACKEND, this.dbBackend);
         }
         if( !additionalProperties.containsKey(DB_DIALECT) ){
             additionalProperties.put(DB_DIALECT, this.dbDialect);
+        }
+        if( !additionalProperties.containsKey(PROJECT_NAME) ) {
+            additionalProperties.put(PROJECT_NAME, this.projectName);
+        }
+        if( !additionalProperties.containsKey(GO_PROJECT_NAME) ) {
+            additionalProperties.put(GO_PROJECT_NAME, this.goProjectName);
+        }else{
+            this.goProjectName = additionalProperties.get(GO_PROJECT_NAME).toString();
+            apiPath = "src/" + this.goProjectName + "/controllers";
+            modelPackage = "src/" + this.goProjectName + "/models";
+            apiPackage = "src/" + this.goProjectName + "/controllers";
+            projectRoot = "src/" + this.goProjectName;
         }
         if( !additionalProperties.containsKey(DB_USER) ){
             additionalProperties.put(DB_USER, this.dbUser);
