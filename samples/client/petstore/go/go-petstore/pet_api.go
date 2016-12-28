@@ -202,8 +202,13 @@ func (a PetApi) FindPetsByStatus(status []string) ([]Pet, *APIResponse, error) {
 		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
 	}
 	var collectionFormat = "csv"
-	localVarQueryParams.Add("status", a.Configuration.APIClient.ParameterToString(status, collectionFormat))
-
+	if collectionFormat == "multi" {
+		for _, value := range status {
+			localVarQueryParams.Add("status", value)
+		}
+	} else {
+		localVarQueryParams.Add("status", a.Configuration.APIClient.ParameterToString(status, collectionFormat))
+	}
 
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{  }
@@ -271,8 +276,13 @@ func (a PetApi) FindPetsByTags(tags []string) ([]Pet, *APIResponse, error) {
 		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
 	}
 	var collectionFormat = "csv"
-	localVarQueryParams.Add("tags", a.Configuration.APIClient.ParameterToString(tags, collectionFormat))
-
+	if collectionFormat == "multi" {
+		for _, value := range tags {
+			localVarQueryParams.Add("tags", value)
+		}
+	} else {
+		localVarQueryParams.Add("tags", a.Configuration.APIClient.ParameterToString(tags, collectionFormat))
+	}
 
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{  }

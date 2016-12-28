@@ -251,4 +251,3 @@ class ReadOnlyFirst implements ArrayAccess
     }
 }
 
-

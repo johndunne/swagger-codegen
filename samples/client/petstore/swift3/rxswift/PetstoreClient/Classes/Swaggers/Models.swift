@@ -126,8 +126,7 @@ class Decoders {
             "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
             "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
             "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss.SSS",
-            "yyyy-MM-dd HH:mm:ss"
+            "yyyy-MM-dd'T'HH:mm:ss.SSS"
         ].map { (format: String) -> DateFormatter in
             let formatter = DateFormatter()
             formatter.dateFormat = format
@@ -142,7 +141,7 @@ class Decoders {
                     }
                 }
             }
-            if let sourceInt = source as? Int64 {
+            if let sourceInt = source as? Int {
                 // treat as a java date
                 return Date(timeIntervalSince1970: Double(sourceInt / 1000) )
             }
@@ -285,20 +284,6 @@ class Decoders {
         }
 
 
-        // Decoder for [ClassModel]
-        Decoders.addDecoder(clazz: [ClassModel].self) { (source: AnyObject) -> [ClassModel] in
-            return Decoders.decode(clazz: [ClassModel].self, source: source)
-        }
-        // Decoder for ClassModel
-        Decoders.addDecoder(clazz: ClassModel.self) { (source: AnyObject) -> ClassModel in
-            let sourceDictionary = source as! [AnyHashable: Any]
-
-            let instance = ClassModel()
-            instance._class = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["_class"] as AnyObject?)
-            return instance
-        }
-
-
         // Decoder for [Client]
         Decoders.addDecoder(clazz: [Client].self) { (source: AnyObject) -> [Client] in
             return Decoders.decode(clazz: [Client].self, source: source)
@@ -386,7 +371,6 @@ class Decoders {
                 instance.enumNumber = EnumTest.EnumNumber(rawValue: (enumNumber))
             }
             
-            instance.outerEnum = Decoders.decodeOptional(clazz: OuterEnum.self, source: sourceDictionary["outerEnum"] as AnyObject?)
             return instance
         }
 
@@ -544,21 +528,6 @@ class Decoders {
             
             instance.complete = Decoders.decodeOptional(clazz: Bool.self, source: sourceDictionary["complete"] as AnyObject?)
             return instance
-        }
-
-
-        // Decoder for [OuterEnum]
-        Decoders.addDecoder(clazz: [OuterEnum].self) { (source: AnyObject) -> [OuterEnum] in
-            return Decoders.decode(clazz: [OuterEnum].self, source: source)
-        }
-        // Decoder for OuterEnum
-        Decoders.addDecoder(clazz: OuterEnum.self) { (source: AnyObject) -> OuterEnum in
-            if let source = source as? String {
-                if let result = OuterEnum(rawValue: source) {
-                    return result
-                }
-            }
-            fatalError("Source \(source) is not convertible to enum type OuterEnum: Maybe swagger file is insufficient")
         }
 
 

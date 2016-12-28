@@ -354,7 +354,7 @@ public class ApiClient {
       StringBuilder b = new StringBuilder();
       for(Object o : (Collection<?>)param) {
         if(b.length() > 0) {
-          b.append(',');
+          b.append(",");
         }
         b.append(String.valueOf(o));
       }
@@ -373,7 +373,7 @@ public class ApiClient {
     // preconditions
     if (name == null || name.isEmpty() || value == null) return params;
 
-    Collection<?> valueCollection;
+    Collection<?> valueCollection = null;
     if (value instanceof Collection<?>) {
       valueCollection = (Collection<?>) value;
     } else {
@@ -386,10 +386,10 @@ public class ApiClient {
     }
 
     // get the collection format
-    String format = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat); // default: csv
+    collectionFormat = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat); // default: csv
 
     // create the params based on the collection format
-    if ("multi".equals(format)) {
+    if (collectionFormat.equals("multi")) {
       for (Object item : valueCollection) {
         params.add(new Pair(name, parameterToString(item)));
       }
@@ -399,13 +399,13 @@ public class ApiClient {
 
     String delimiter = ",";
 
-    if ("csv".equals(format)) {
+    if (collectionFormat.equals("csv")) {
       delimiter = ",";
-    } else if ("ssv".equals(format)) {
+    } else if (collectionFormat.equals("ssv")) {
       delimiter = " ";
-    } else if ("tsv".equals(format)) {
+    } else if (collectionFormat.equals("tsv")) {
       delimiter = "\t";
-    } else if ("pipes".equals(format)) {
+    } else if (collectionFormat.equals("pipes")) {
       delimiter = "|";
     }
 

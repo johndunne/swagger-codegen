@@ -20,8 +20,6 @@ module Petstore
 
     attr_accessor :enum_number
 
-    attr_accessor :outer_enum
-
     class EnumAttributeValidator
       attr_reader :datatype
       attr_reader :allowable_values
@@ -49,8 +47,7 @@ module Petstore
       {
         :'enum_string' => :'enum_string',
         :'enum_integer' => :'enum_integer',
-        :'enum_number' => :'enum_number',
-        :'outer_enum' => :'outerEnum'
+        :'enum_number' => :'enum_number'
       }
     end
 
@@ -59,8 +56,7 @@ module Petstore
       {
         :'enum_string' => :'String',
         :'enum_integer' => :'Integer',
-        :'enum_number' => :'Float',
-        :'outer_enum' => :'OuterEnum'
+        :'enum_number' => :'Float'
       }
     end
 
@@ -82,10 +78,6 @@ module Petstore
 
       if attributes.has_key?(:'enum_number')
         self.enum_number = attributes[:'enum_number']
-      end
-
-      if attributes.has_key?(:'outerEnum')
-        self.outer_enum = attributes[:'outerEnum']
       end
 
     end
@@ -146,8 +138,7 @@ module Petstore
       self.class == o.class &&
           enum_string == o.enum_string &&
           enum_integer == o.enum_integer &&
-          enum_number == o.enum_number &&
-          outer_enum == o.outer_enum
+          enum_number == o.enum_number
     end
 
     # @see the `==` method
@@ -159,7 +150,7 @@ module Petstore
     # Calculates hash code according to all attributes.
     # @return [Fixnum] Hash code
     def hash
-      [enum_string, enum_integer, enum_number, outer_enum].hash
+      [enum_string, enum_integer, enum_number].hash
     end
 
     # Builds the object from hash

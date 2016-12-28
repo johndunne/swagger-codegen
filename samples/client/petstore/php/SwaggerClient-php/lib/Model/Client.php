@@ -225,4 +225,3 @@ class Client implements ArrayAccess
     }
 }
 
-

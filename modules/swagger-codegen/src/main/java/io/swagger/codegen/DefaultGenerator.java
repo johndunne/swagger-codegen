@@ -78,11 +78,18 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         generateApis = System.getProperty("apis") != null ? true:null;
         generateModels = System.getProperty("models") != null ? true: null;
         generateSupportingFiles = System.getProperty("supportingFiles") != null ? true:null;
+        // model/api tests and documentation options rely on parent generate options (api or model) and no other options.
+        // They default to true in all scenarios and can only be marked false explicitly
+        generateModelTests = System.getProperty("modelTests") != null ? Boolean.valueOf(System.getProperty("modelTests")): true;
+        generateModelDocumentation = System.getProperty("modelDocs") != null ? Boolean.valueOf(System.getProperty("modelDocs")):true;
+        generateApiTests = System.getProperty("apiTests") != null ? Boolean.valueOf(System.getProperty("apiTests")): true;
+        generateApiDocumentation = System.getProperty("apiDocs") != null ? Boolean.valueOf(System.getProperty("apiDocs")):true;
 
-        if (generateApis == null && generateModels == null && generateSupportingFiles == null) {
+        if(generateApis == null && generateModels == null && generateSupportingFiles == null) {
             // no specifics are set, generate everything
             generateApis = generateModels = generateSupportingFiles = true;
-        } else {
+        }
+        else {
             if(generateApis == null) {
                 generateApis = false;
             }
@@ -93,14 +100,6 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                 generateSupportingFiles = false;
             }
         }
-        // model/api tests and documentation options rely on parent generate options (api or model) and no other options.
-        // They default to true in all scenarios and can only be marked false explicitly
-        generateModelTests = System.getProperty("modelTests") != null ? Boolean.valueOf(System.getProperty("modelTests")): true;
-        generateModelDocumentation = System.getProperty("modelDocs") != null ? Boolean.valueOf(System.getProperty("modelDocs")):true;
-        generateApiTests = System.getProperty("apiTests") != null ? Boolean.valueOf(System.getProperty("apiTests")): true;
-        generateApiDocumentation = System.getProperty("apiDocs") != null ? Boolean.valueOf(System.getProperty("apiDocs")):true;
-
-
         // Additional properties added for tests to exclude references in project related files
         config.additionalProperties().put(CodegenConstants.GENERATE_API_TESTS, generateApiTests);
         config.additionalProperties().put(CodegenConstants.GENERATE_MODEL_TESTS, generateModelTests);
@@ -113,16 +112,11 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         config.processOpts();
         config.preprocessSwagger(swagger);
         config.additionalProperties().put("generatedDate", DateTime.now().toString());
-        config.additionalProperties().put("generatorClass", config.getClass().getName());
+        config.additionalProperties().put("generatorClass", config.getClass().toString());
         config.additionalProperties().put("inputSpec", config.getInputSpec());
         if (swagger.getVendorExtensions() != null) {
             config.vendorExtensions().putAll(swagger.getVendorExtensions());
         }
-
-        contextPath = config.escapeText(swagger.getBasePath() == null ? "" : swagger.getBasePath());
-        basePath = config.escapeText(getHost());
-        basePathWithoutHost = config.escapeText(swagger.getBasePath());
-
     }
 
     private void configureSwaggerInfo() {
@@ -526,7 +520,6 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                         if (in != null) {
                             LOGGER.info("writing file " + outputFile);
                             IOUtils.copy(in, out);
-                            out.close();
                         } else {
                             LOGGER.error("can't open " + templateFile + " for input");
                         }
@@ -588,7 +581,9 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         if (swagger.getHost() != null) {
             bundle.put("host", swagger.getHost());
         }
-
+        contextPath = config.escapeText(swagger.getBasePath() == null ? "" : swagger.getBasePath());
+        basePath = config.escapeText(getHost());
+        basePathWithoutHost = config.escapeText(swagger.getBasePath());
         bundle.put("swagger", this.swagger);
         bundle.put("basePath", basePath);
         bundle.put("basePathWithoutHost",basePathWithoutHost);
@@ -871,7 +866,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
 
             if (os != null && os.size() > 0) {
                 CodegenOperation op = os.get(os.size() - 1);
-                op.hasMore = false;
+                op.hasMore = null;
             }
         }
         return operations;

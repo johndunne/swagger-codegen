@@ -203,4 +203,3 @@ class AnimalFarm implements ArrayAccess
     }
 }
 
-

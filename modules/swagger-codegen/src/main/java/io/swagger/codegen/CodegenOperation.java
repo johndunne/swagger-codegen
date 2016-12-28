@@ -11,10 +11,10 @@ import java.util.Arrays;
 
 public class CodegenOperation {
     public final List<CodegenProperty> responseHeaders = new ArrayList<CodegenProperty>();
-    public boolean hasAuthMethods, hasConsumes, hasProduces, hasParams, hasOptionalParams,
+    public Boolean hasAuthMethods, hasConsumes, hasProduces, hasParams, hasOptionalParams,
             returnTypeIsPrimitive, returnSimpleType, subresourceOperation, isMapContainer,
-            isListContainer, isMultipart, hasMore = true,
-            isResponseBinary = false, isResponseFile = false, hasReference = false,
+            isListContainer, isMultipart, hasMore = Boolean.TRUE,
+            isResponseBinary = Boolean.FALSE, hasReference = Boolean.FALSE,
             isRestfulIndex, isRestfulShow, isRestfulCreate, isRestfulUpdate, isRestfulDestroy,
             isRestful;
     public Boolean createOperation, requestOperation, updateOperation, destroyOperation, createOrUpdateOperation;
@@ -190,35 +190,33 @@ public class CodegenOperation {
 
         if (responseHeaders != null ? !responseHeaders.equals(that.responseHeaders) : that.responseHeaders != null)
             return false;
-        if (hasAuthMethods != that.hasAuthMethods)
+        if (hasAuthMethods != null ? !hasAuthMethods.equals(that.hasAuthMethods) : that.hasAuthMethods != null)
             return false;
-        if (hasConsumes != that.hasConsumes)
+        if (hasConsumes != null ? !hasConsumes.equals(that.hasConsumes) : that.hasConsumes != null)
             return false;
-        if (hasProduces != that.hasProduces)
+        if (hasProduces != null ? !hasProduces.equals(that.hasProduces) : that.hasProduces != null)
             return false;
-        if (hasParams != that.hasParams)
+        if (hasParams != null ? !hasParams.equals(that.hasParams) : that.hasParams != null)
             return false;
-        if (hasOptionalParams != that.hasOptionalParams)
+        if (hasOptionalParams != null ? !hasOptionalParams.equals(that.hasOptionalParams) : that.hasOptionalParams != null)
             return false;
-        if (returnTypeIsPrimitive != that.returnTypeIsPrimitive)
+        if (returnTypeIsPrimitive != null ? !returnTypeIsPrimitive.equals(that.returnTypeIsPrimitive) : that.returnTypeIsPrimitive != null)
             return false;
-        if (returnSimpleType != that.returnSimpleType)
+        if (returnSimpleType != null ? !returnSimpleType.equals(that.returnSimpleType) : that.returnSimpleType != null)
             return false;
-        if (subresourceOperation != that.subresourceOperation)
+        if (subresourceOperation != null ? !subresourceOperation.equals(that.subresourceOperation) : that.subresourceOperation != null)
             return false;
-        if (isMapContainer != that.isMapContainer)
+        if (isMapContainer != null ? !isMapContainer.equals(that.isMapContainer) : that.isMapContainer != null)
             return false;
-        if (isListContainer != that.isListContainer)
+        if (isListContainer != null ? !isListContainer.equals(that.isListContainer) : that.isListContainer != null)
             return false;
-        if (isMultipart != that.isMultipart)
+        if (isMultipart != null ? !isMultipart.equals(that.isMultipart) : that.isMultipart != null)
             return false;
-        if (hasMore != that.hasMore)
+        if (hasMore != null ? !hasMore.equals(that.hasMore) : that.hasMore != null)
             return false;
-        if (isResponseBinary != that.isResponseBinary)
+        if (isResponseBinary != null ? !isResponseBinary.equals(that.isResponseBinary) : that.isResponseBinary != null)
             return false;
-        if (hasReference != that.hasReference)
-            return false;
-        if (isResponseFile != that.isResponseFile)
+        if (hasReference != null ? !hasReference.equals(that.hasReference) : that.hasReference != null)
             return false;
         if (path != null ? !path.equals(that.path) : that.path != null)
             return false;
@@ -287,21 +285,20 @@ public class CodegenOperation {
     @Override
     public int hashCode() {
         int result = responseHeaders.hashCode();
-        result = 31 * result + (hasAuthMethods ? 13:31);
-        result = 31 * result + (hasConsumes ? 13:31);
-        result = 31 * result + (hasProduces ? 13:31);
-        result = 31 * result + (hasParams ? 13:31);
-        result = 31 * result + (hasOptionalParams ? 13:31);
-        result = 31 * result + (returnTypeIsPrimitive ? 13:31);
-        result = 31 * result + (returnSimpleType ? 13:31);
-        result = 31 * result + (subresourceOperation ? 13:31);
-        result = 31 * result + (isMapContainer ? 13:31);
-        result = 31 * result + (isListContainer ? 13:31);
-        result = 31 * result + (isMultipart ? 13:31);
-        result = 31 * result + (hasMore ? 13:31);
-        result = 31 * result + (isResponseBinary ? 13:31);
-        result = 31 * result + (isResponseFile ? 13:31);
-        result = 31 * result + (hasReference ? 13:31);
+        result = 31 * result + (hasAuthMethods != null ? hasAuthMethods.hashCode() : 0);
+        result = 31 * result + (hasConsumes != null ? hasConsumes.hashCode() : 0);
+        result = 31 * result + (hasProduces != null ? hasProduces.hashCode() : 0);
+        result = 31 * result + (hasParams != null ? hasParams.hashCode() : 0);
+        result = 31 * result + (hasOptionalParams != null ? hasOptionalParams.hashCode() : 0);
+        result = 31 * result + (returnTypeIsPrimitive != null ? returnTypeIsPrimitive.hashCode() : 0);
+        result = 31 * result + (returnSimpleType != null ? returnSimpleType.hashCode() : 0);
+        result = 31 * result + (subresourceOperation != null ? subresourceOperation.hashCode() : 0);
+        result = 31 * result + (isMapContainer != null ? isMapContainer.hashCode() : 0);
+        result = 31 * result + (isListContainer != null ? isListContainer.hashCode() : 0);
+        result = 31 * result + (isMultipart != null ? isMultipart.hashCode() : 0);
+        result = 31 * result + (hasMore != null ? hasMore.hashCode() : 0);
+        result = 31 * result + (isResponseBinary != null ? isResponseBinary.hashCode() : 0);
+        result = 31 * result + (hasReference != null ? hasReference.hashCode() : 0);
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (operationId != null ? operationId.hashCode() : 0);
         result = 31 * result + (returnType != null ? returnType.hashCode() : 0);

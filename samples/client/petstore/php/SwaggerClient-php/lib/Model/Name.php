@@ -310,4 +310,3 @@ class Name implements ArrayAccess
     }
 }
 
-

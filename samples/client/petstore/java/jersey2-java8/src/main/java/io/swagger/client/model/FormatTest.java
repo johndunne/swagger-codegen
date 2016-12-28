@@ -73,8 +73,8 @@ public class FormatTest {
 
    /**
    * Get integer
-   * minimum: 10
-   * maximum: 100
+   * minimum: 10.0
+   * maximum: 100.0
    * @return integer
   **/
   @ApiModelProperty(example = "null", value = "")
@@ -93,8 +93,8 @@ public class FormatTest {
 
    /**
    * Get int32
-   * minimum: 20
-   * maximum: 200
+   * minimum: 20.0
+   * maximum: 200.0
    * @return int32
   **/
   @ApiModelProperty(example = "null", value = "")

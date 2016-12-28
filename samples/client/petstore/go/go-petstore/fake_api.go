@@ -219,10 +219,15 @@ func (a FakeApi) TestEnumParameters(enumFormStringArray []string, enumFormString
 		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
 	}
 	var collectionFormat = "csv"
-	localVarQueryParams.Add("enum_query_string_array", a.Configuration.APIClient.ParameterToString(enumQueryStringArray, collectionFormat))
-
-	localVarQueryParams.Add("enum_query_string", a.Configuration.APIClient.ParameterToString(enumQueryString, ""))
-	localVarQueryParams.Add("enum_query_integer", a.Configuration.APIClient.ParameterToString(enumQueryInteger, ""))
+	if collectionFormat == "multi" {
+		for _, value := range enumQueryStringArray {
+			localVarQueryParams.Add("enum_query_string_array", value)
+		}
+	} else {
+		localVarQueryParams.Add("enum_query_string_array", a.Configuration.APIClient.ParameterToString(enumQueryStringArray, collectionFormat))
+	}
+		localVarQueryParams.Add("enum_query_string", a.Configuration.APIClient.ParameterToString(enumQueryString, ""))
+		localVarQueryParams.Add("enum_query_integer", a.Configuration.APIClient.ParameterToString(enumQueryInteger, ""))
 
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{ "*/*",  }

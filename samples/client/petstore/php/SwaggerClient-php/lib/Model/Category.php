@@ -251,4 +251,3 @@ class Category implements ArrayAccess
     }
 }
 
-

@@ -225,4 +225,3 @@ class ArrayOfNumberOnly implements ArrayAccess
     }
 }
 
-

@@ -396,4 +396,3 @@ class Pet implements ArrayAccess
     }
 }
 
-

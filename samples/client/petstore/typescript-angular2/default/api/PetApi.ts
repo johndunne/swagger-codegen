@@ -39,8 +39,8 @@ export class PetApi {
             this.configuration = configuration;
         }
     }
-
-    /**
+	
+	/**
      * 
      * Extends object by coping non-existing properties.
      * @param objA object to be extended
@@ -217,10 +217,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
 
@@ -258,7 +255,6 @@ export class PetApi {
             throw new Error('Required parameter petId was null or undefined when calling deletePet.');
         }
 
-        headers.set('api_key', String(apiKey));
 
         // to determine the Content-Type header
         let consumes: string[] = [
@@ -274,10 +270,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
 
@@ -326,10 +319,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
 
@@ -378,10 +368,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
 
@@ -431,10 +418,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
         // authentication (api_key) required
         if (this.configuration.apiKey)
@@ -487,10 +471,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
 
@@ -547,10 +528,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
         headers.set('Content-Type', 'application/x-www-form-urlencoded');
@@ -613,10 +591,7 @@ export class PetApi {
         // oauth required
         if (this.configuration.accessToken)
         {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + this.configuration.accessToken);
         }
             
         headers.set('Content-Type', 'application/x-www-form-urlencoded');

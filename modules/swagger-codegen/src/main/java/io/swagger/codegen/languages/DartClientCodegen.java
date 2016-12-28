@@ -25,8 +25,6 @@ public class DartClientCodegen extends DefaultCodegen implements CodegenConfig {
     protected String pubVersion = "1.0.0";
     protected String pubDescription = "Swagger API client";
     protected String sourceFolder = "";
-    protected String apiDocPath = "docs/";
-    protected String modelDocPath = "docs/";
 
     public DartClientCodegen() {
         super();
@@ -41,8 +39,6 @@ public class DartClientCodegen extends DefaultCodegen implements CodegenConfig {
         embeddedTemplateDir = templateDir = "dart";
         apiPackage = "lib.api";
         modelPackage = "lib.model";
-        modelDocTemplateFiles.put("object_doc.mustache", ".md");
-        apiDocTemplateFiles.put("api_doc.mustache", ".md");
 
         setReservedWordsLowerCase(
                 Arrays.asList(
@@ -149,10 +145,6 @@ public class DartClientCodegen extends DefaultCodegen implements CodegenConfig {
             this.setSourceFolder((String) additionalProperties.get(CodegenConstants.SOURCE_FOLDER));
         }
 
-        // make api and model doc path available in mustache template
-        additionalProperties.put("apiDocPath", apiDocPath);
-        additionalProperties.put("modelDocPath", modelDocPath);
-
         final String libFolder = sourceFolder + File.separator + "lib";
         supportingFiles.add(new SupportingFile("pubspec.mustache", "", "pubspec.yaml"));
         supportingFiles.add(new SupportingFile("analysis_options.mustache", "", ".analysis_options"));
@@ -168,7 +160,6 @@ public class DartClientCodegen extends DefaultCodegen implements CodegenConfig {
         supportingFiles.add(new SupportingFile("auth/oauth.mustache", authFolder, "oauth.dart"));
         supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
         supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
-        supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
 
     }
 
@@ -186,16 +177,6 @@ public class DartClientCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public String modelFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
-    }
-
-    @Override
-    public String apiDocFileFolder() {
-        return (outputFolder + "/" + apiDocPath).replace('/', File.separatorChar);
-    }
-
-    @Override
-    public String modelDocFileFolder() {
-        return (outputFolder + "/" + modelDocPath).replace('/', File.separatorChar);
     }
 
     @Override

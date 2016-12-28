@@ -32,7 +32,7 @@ public class AnimalFarm extends ArrayList<Animal> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return super.equals(o);
+    return true;
   }
 
   @Override

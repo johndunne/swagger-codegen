@@ -261,4 +261,3 @@ class Animal implements ArrayAccess
     }
 }
 
-

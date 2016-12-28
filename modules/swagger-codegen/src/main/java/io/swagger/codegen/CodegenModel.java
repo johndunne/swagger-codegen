@@ -39,8 +39,8 @@ public class CodegenModel {
     public Set<String> allMandatory;
 
     public Set<String> imports = new TreeSet<String>();
-    public boolean hasVars, emptyVars, hasMoreModels, hasEnums, isEnum, hasRequired, isArrayModel, hasChildren;
-    public boolean hasOnlyReadOnly = true; // true if all properties are read-only
+    public Boolean hasVars, emptyVars, hasMoreModels, hasEnums, isEnum, hasRequired, isArrayModel, hasChildren;
+    public Boolean hasOnlyReadOnly = true; // true if all properties are read-only
     public ExternalDocs externalDocs;
 
     public Map<String, Object> vendorExtensions;
@@ -115,15 +115,15 @@ public class CodegenModel {
             return false;
         if (imports != null ? !imports.equals(that.imports) : that.imports != null)
             return false;
-        if (hasVars != that.hasVars)
+        if (hasVars != null ? !hasVars.equals(that.hasVars) : that.hasVars != null)
             return false;
-        if (emptyVars != that.emptyVars)
+        if (emptyVars != null ? !emptyVars.equals(that.emptyVars) : that.emptyVars != null)
             return false;
-        if (hasMoreModels != that.hasMoreModels)
+        if (hasMoreModels != null ? !hasMoreModels.equals(that.hasMoreModels) : that.hasMoreModels != null)
             return false;
-        if (hasEnums != that.hasEnums)
+        if (hasEnums != null ? !hasEnums.equals(that.hasEnums) : that.hasEnums != null)
             return false;
-        if (isEnum != that.isEnum)
+        if (isEnum != null ? !isEnum.equals(that.isEnum) : that.isEnum != null)
             return false;
         if (externalDocs != null ? !externalDocs.equals(that.externalDocs) : that.externalDocs != null)
             return false;
@@ -163,11 +163,11 @@ public class CodegenModel {
         result = 31 * result + (mandatory != null ? mandatory.hashCode() : 0);
         result = 31 * result + (allMandatory != null ? allMandatory.hashCode() : 0);
         result = 31 * result + (imports != null ? imports.hashCode() : 0);
-        result = 31 * result + (hasVars ? 13:31);
-        result = 31 * result + (emptyVars ? 13:31);
-        result = 31 * result + (hasMoreModels ? 13:31);
-        result = 31 * result + (hasEnums ? 13:31);
-        result = 31 * result + (isEnum ? 13:31);
+        result = 31 * result + (hasVars != null ? hasVars.hashCode() : 0);
+        result = 31 * result + (emptyVars != null ? emptyVars.hashCode() : 0);
+        result = 31 * result + (hasMoreModels != null ? hasMoreModels.hashCode() : 0);
+        result = 31 * result + (hasEnums != null ? hasEnums.hashCode() : 0);
+        result = 31 * result + (isEnum != null ? isEnum.hashCode() : 0);
         result = 31 * result + (externalDocs != null ? externalDocs.hashCode() : 0);
         result = 31 * result + (vendorExtensions != null ? vendorExtensions.hashCode() : 0);
         result = 31 * result + Objects.hash(hasOnlyReadOnly);

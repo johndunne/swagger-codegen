@@ -156,16 +156,12 @@ public class CodegenConfiguratorTest {
     public void testAdditionalProperties() throws Exception {
 
         configurator.addAdditionalProperty("foo", "bar")
-                .addAdditionalProperty("hello", "world")
-                .addAdditionalProperty("supportJava6", false)
-                .addAdditionalProperty("useRxJava", true);
+                .addAdditionalProperty("hello", "world");
 
         final ClientOptInput clientOptInput = setupAndRunGenericTest(configurator);
 
         assertValueInMap(clientOptInput.getConfig().additionalProperties(), "foo", "bar");
         assertValueInMap(clientOptInput.getConfig().additionalProperties(), "hello", "world");
-        assertValueInMap(clientOptInput.getConfig().additionalProperties(), "supportJava6", false);
-        assertValueInMap(clientOptInput.getConfig().additionalProperties(), "useRxJava", true);
     }
 
     @Test
@@ -245,14 +241,10 @@ public class CodegenConfiguratorTest {
     @Test
     public void testDynamicProperties() throws Exception {
         configurator.addDynamicProperty(CodegenConstants.LOCAL_VARIABLE_PREFIX, "_");
-        configurator.addDynamicProperty("supportJava6", false);
-        configurator.addDynamicProperty("useRxJava", true);
 
         final ClientOptInput clientOptInput = setupAndRunGenericTest(configurator);
 
         assertValueInMap(clientOptInput.getConfig().additionalProperties(), CodegenConstants.LOCAL_VARIABLE_PREFIX, "_");
-        assertValueInMap(clientOptInput.getConfig().additionalProperties(), "supportJava6", false);
-        assertValueInMap(clientOptInput.getConfig().additionalProperties(), "useRxJava", true);
     }
 
     @Test
@@ -352,7 +344,7 @@ public class CodegenConfiguratorTest {
         }};
     }
 
-    private static void assertValueInMap(Map<?, ?> map, String propertyKey, Object expectedPropertyValue) {
+    private static void assertValueInMap(Map<?, ?> map, String propertyKey, String expectedPropertyValue) {
         assertTrue(map.containsKey(propertyKey));
         assertEquals(map.get(propertyKey), expectedPropertyValue);
     }

@@ -329,7 +329,7 @@ public class ApiClient {
       StringBuilder b = new StringBuilder();
       for(Object o : (Collection)param) {
         if(b.length() > 0) {
-          b.append(',');
+          b.append(",");
         }
         b.append(String.valueOf(o));
       }
@@ -348,7 +348,7 @@ public class ApiClient {
     // preconditions
     if (name == null || name.isEmpty() || value == null) return params;
 
-    Collection valueCollection;
+    Collection valueCollection = null;
     if (value instanceof Collection) {
       valueCollection = (Collection) value;
     } else {
@@ -361,10 +361,10 @@ public class ApiClient {
     }
 
     // get the collection format
-    String format = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat); // default: csv
+    collectionFormat = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat); // default: csv
 
     // create the params based on the collection format
-    if ("multi".equals(format)) {
+    if (collectionFormat.equals("multi")) {
       for (Object item : valueCollection) {
         params.add(new Pair(name, parameterToString(item)));
       }
@@ -374,13 +374,13 @@ public class ApiClient {
 
     String delimiter = ",";
 
-    if ("csv".equals(format)) {
+    if (collectionFormat.equals("csv")) {
       delimiter = ",";
-    } else if ("ssv".equals(format)) {
+    } else if (collectionFormat.equals("ssv")) {
       delimiter = " ";
-    } else if ("tsv".equals(format)) {
+    } else if (collectionFormat.equals("tsv")) {
       delimiter = "\t";
-    } else if ("pipes".equals(format)) {
+    } else if (collectionFormat.equals("pipes")) {
       delimiter = "|";
     }
 
@@ -464,7 +464,7 @@ public class ApiClient {
    * Content-Type (only JSON is supported for now).
    */
   public Entity<?> serialize(Object obj, Map<String, Object> formParams, String contentType) throws ApiException {
-    Entity<?> entity;
+    Entity<?> entity = null;
     if (contentType.startsWith("multipart/form-data")) {
       MultiPart multiPart = new MultiPart();
       for (Entry<String, Object> param: formParams.entrySet()) {
@@ -495,7 +495,6 @@ public class ApiClient {
   /**
    * Deserialize response body to Java object according to the Content-Type.
    */
-  @SuppressWarnings("unchecked")
   public <T> T deserialize(Response response, GenericType<T> returnType) throws ApiException {
     if (response == null || returnType == null) {
       return null;
@@ -504,8 +503,9 @@ public class ApiClient {
     if ("byte[]".equals(returnType.toString())) {
       // Handle binary response (byte array).
       return (T) response.readEntity(byte[].class);
-    } else if (returnType.getRawType() == File.class) {
+    } else if (returnType.equals(File.class)) {
       // Handle file downloading.
+      @SuppressWarnings("unchecked")
       T file = (T) downloadFileFromResponse(response);
       return file;
     }
@@ -551,13 +551,13 @@ public class ApiClient {
         filename = matcher.group(1);
     }
 
-    String prefix;
+    String prefix = null;
     String suffix = null;
     if (filename == null) {
       prefix = "download-";
       suffix = "";
     } else {
-      int pos = filename.lastIndexOf('.');
+      int pos = filename.lastIndexOf(".");
       if (pos == -1) {
         prefix = filename + "-";
       } else {
@@ -607,17 +607,16 @@ public class ApiClient {
 
     Invocation.Builder invocationBuilder = target.request().accept(accept);
 
-    for (Entry<String, String> entry : headerParams.entrySet()) {
-      String value = entry.getValue();
+    for (String key : headerParams.keySet()) {
+      String value = headerParams.get(key);
       if (value != null) {
-        invocationBuilder = invocationBuilder.header(entry.getKey(), value);
+        invocationBuilder = invocationBuilder.header(key, value);
       }
     }
 
-    for (Entry<String, String> entry : defaultHeaderMap.entrySet()) {
-      String key = entry.getKey();
+    for (String key : defaultHeaderMap.keySet()) {
       if (!headerParams.containsKey(key)) {
-        String value = entry.getValue();
+        String value = defaultHeaderMap.get(key);
         if (value != null) {
           invocationBuilder = invocationBuilder.header(key, value);
         }
@@ -626,7 +625,7 @@ public class ApiClient {
 
     Entity<?> entity = serialize(body, formParams, contentType);
 
-    Response response;
+    Response response = null;
 
     if ("GET".equals(method)) {
       response = invocationBuilder.get();
@@ -647,7 +646,7 @@ public class ApiClient {
 
     if (response.getStatus() == Status.NO_CONTENT.getStatusCode()) {
       return null;
-    } else if (response.getStatusInfo().getFamily() == Status.Family.SUCCESSFUL) {
+    } else if (response.getStatusInfo().getFamily().equals(Status.Family.SUCCESSFUL)) {
       if (returnType == null)
         return null;
       else
