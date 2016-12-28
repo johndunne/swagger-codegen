@@ -9,10 +9,10 @@ package controllers
 import (
     "errors"
     "net/http"
-    "quickflickserver/{{handlers_package_name}}"
-    "quickflickserver/helpers"
+    "{{project_name}}/{{handlers_package_name}}"
+    "{{project_name}}/helpers"
 {{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "encoding/json" //{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
-{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "quickflickserver/models" //ignore{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
+{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "{{project_name}}/models" //ignore{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
 {{#operations}}{{#operation}}{{#vendorExtensions.x-cache-control-header}}   "strings" //{{/vendorExtensions.x-cache-control-header}}{{/operation}}{{/operations}}
 )
 
