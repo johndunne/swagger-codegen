@@ -38,56 +38,46 @@ public struct SynchronizedDictionary<K: Hashable, V> {
 }
 
 // Store manager to retain its reference
-<<<<<<< HEAD
-private var managerStore: [String: Alamofire.SessionManager] = [:]
-=======
 private var managerStore = SynchronizedDictionary<String, Alamofire.Manager>()
->>>>>>> upstream/master
 
 class AlamofireRequestBuilder<T>: RequestBuilder<T> {
-    required init(method: String, URLString: String, parameters: [String : Any]?, isBody: Bool) {
+    required init(method: String, URLString: String, parameters: [String : AnyObject]?, isBody: Bool) {
         super.init(method: method, URLString: URLString, parameters: parameters, isBody: isBody)
     }
 
-    override func execute(_ completion: @escaping (_ response: Response<T>?, _ error: Error?) -> Void) {
-        let managerId:String = NSUUID().uuidString
+    override func execute(completion: (response: Response<T>?, error: ErrorType?) -> Void) {
+        let managerId = NSUUID().UUIDString
         // Create a new manager for each request to customize its request header
-        let configuration = URLSessionConfiguration.default
-        configuration.httpAdditionalHeaders = buildHeaders()
-        let manager = Alamofire.SessionManager(configuration: configuration)
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.HTTPAdditionalHeaders = buildHeaders()
+        let manager = Alamofire.Manager(configuration: configuration)
         managerStore[managerId] = manager
 
-        let encoding:ParameterEncoding = isBody ? JSONEncoding() : URLEncoding()
-
-        let xMethod = Alamofire.HTTPMethod(rawValue: method)
-        let fileKeys = parameters == nil ? [] : parameters!.filter { $1 is NSURL }
+        let encoding = isBody ? Alamofire.ParameterEncoding.JSON : Alamofire.ParameterEncoding.URL
+        let xMethod = Alamofire.Method(rawValue: method)
+        let fileKeys = parameters == nil ? [] : parameters!.filter { $1.isKindOfClass(NSURL) }
                                                            .map { $0.0 }
 
         if fileKeys.count > 0 {
-            manager.upload(multipartFormData: { mpForm in
-                for (k, v) in self.parameters! {
-                    switch v {
-                    case let fileURL as URL:
-                        mpForm.append(fileURL, withName: k)
-                        break
-                    case let string as String:
-                        mpForm.append(string.data(using: String.Encoding.utf8)!, withName: k)
-                        break
-                    case let number as NSNumber:
-                        mpForm.append(number.stringValue.data(using: String.Encoding.utf8)!, withName: k)
-                        break
-                    default:
-                        fatalError("Unprocessable value \(v) with key \(k)")
-                        break
+            manager.upload(
+                xMethod!, URLString, headers: nil,
+                multipartFormData: { mpForm in
+                    for (k, v) in self.parameters! {
+                        switch v {
+                        case let fileURL as NSURL:
+                            mpForm.appendBodyPart(fileURL: fileURL, name: k)
+                            break
+                        case let string as NSString:
+                            mpForm.appendBodyPart(data: string.dataUsingEncoding(NSUTF8StringEncoding)!, name: k)
+                            break
+                        case let number as NSNumber:
+                            mpForm.appendBodyPart(data: number.stringValue.dataUsingEncoding(NSUTF8StringEncoding)!, name: k)
+                            break
+                        default:
+                            fatalError("Unprocessable value \(v) with key \(k)")
+                            break
+                        }
                     }
-<<<<<<< HEAD
-                }
-                }, to: URLString, method: xMethod!, headers: nil, encodingCompletion: { encodingResult in
-                switch encodingResult {
-                case .success(let upload, _, _):
-                    if let onProgressReady = self.onProgressReady {
-                        onProgressReady(upload.progress)
-=======
                 },
                 encodingMemoryThreshold: Manager.MultipartFormDataEncodingMemoryThreshold,
                 encodingCompletion: { encodingResult in
@@ -99,34 +89,26 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                         self.processRequest(uploadRequest, managerId, completion)
                     case .Failure(let encodingError):
                         completion(response: nil, error: ErrorResponse.Error(415, nil, encodingError))
->>>>>>> upstream/master
                     }
-                    self.processRequest(request: upload, managerId, completion)
-                case .failure(let encodingError):
-                    completion(nil, ErrorResponse.Error(415, nil, encodingError))
                 }
-            })
+            )
         } else {
-            let request = manager.request(URLString, method: xMethod!, parameters: parameters, encoding: encoding)
+            let request = manager.request(xMethod!, URLString, parameters: parameters, encoding: encoding)
             if let onProgressReady = self.onProgressReady {
                 onProgressReady(request.progress)
             }
-            processRequest(request: manager.request(URLString, method: xMethod!, parameters: parameters, encoding: encoding), managerId, completion)
+            processRequest(request, managerId, completion)
         }
 
     }
 
-    private func processRequest(request: DataRequest, _ managerId: String, _ completion: @escaping (_ response: Response<T>?, _ error: Error?) -> Void) {
+    private func processRequest(request: Request, _ managerId: String, _ completion: (response: Response<T>?, error: ErrorType?) -> Void) {
         if let credential = self.credential {
             request.authenticate(usingCredential: credential)
         }
 
         let cleanupRequest = {
-<<<<<<< HEAD
-            managerStore.removeValue(forKey: managerId)
-=======
             managerStore[managerId] = nil
->>>>>>> upstream/master
         }
 
         let validatedRequest = request.validate()
@@ -138,31 +120,18 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
 
                 if stringResponse.result.isFailure {
                     completion(
-<<<<<<< HEAD
-                        nil,
-                        ErrorResponse.Error(stringResponse.response?.statusCode ?? 500, stringResponse.data, stringResponse.result.error!)
-=======
                         response: nil,
                         error: ErrorResponse.Error(stringResponse.response?.statusCode ?? 500, stringResponse.data, stringResponse.result.error!)
->>>>>>> upstream/master
                     )
                     return
                 }
 
                 completion(
-<<<<<<< HEAD
-                    Response(
-                        response: stringResponse.response!,
-                        body: (stringResponse.result.value ?? "") as! T
-                    ),
-                    nil
-=======
                     response: Response(
                         response: stringResponse.response!,
                         body: (stringResponse.result.value ?? "") as! T
                     ),
                     error: nil
->>>>>>> upstream/master
                 )
             })
         case is Void.Type:
@@ -171,27 +140,13 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
 
                 if voidResponse.result.isFailure {
                     completion(
-<<<<<<< HEAD
-                        nil,
-                        ErrorResponse.Error(voidResponse.response?.statusCode ?? 500, voidResponse.data, voidResponse.result.error!)
-=======
                         response: nil,
                         error: ErrorResponse.Error(voidResponse.response?.statusCode ?? 500, voidResponse.data, voidResponse.result.error!)
->>>>>>> upstream/master
                     )
                     return
                 }
 
                 completion(
-<<<<<<< HEAD
-                    Response(
-                        response: voidResponse.response!,
-                        body: nil),
-                    nil
-                )
-            })
-        case is Data.Type:
-=======
                     response: Response(
                         response: voidResponse.response!,
                         body: nil
@@ -200,70 +155,56 @@ class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                 )
             })
         case is NSData.Type:
->>>>>>> upstream/master
             validatedRequest.responseData(completionHandler: { (dataResponse) in
                 cleanupRequest()
 
                 if (dataResponse.result.isFailure) {
                     completion(
-<<<<<<< HEAD
-                        nil,
-                        ErrorResponse.Error(dataResponse.response?.statusCode ?? 500, dataResponse.data, dataResponse.result.error!)
-=======
                         response: nil,
                         error: ErrorResponse.Error(dataResponse.response?.statusCode ?? 500, dataResponse.data, dataResponse.result.error!)
->>>>>>> upstream/master
                     )
                     return
                 }
 
                 completion(
-                    Response(
+                    response: Response(
                         response: dataResponse.response!,
                         body: dataResponse.data as! T
                     ),
-                    nil
+                    error: nil
                 )
             })
         default:
-            validatedRequest.responseJSON(options: .allowFragments) { response in
+            validatedRequest.responseJSON(options: .AllowFragments) { response in
                 cleanupRequest()
 
                 if response.result.isFailure {
-<<<<<<< HEAD
-                    completion(nil, ErrorResponse.Error(response.response?.statusCode ?? 500, response.data, response.result.error!))
-=======
                     completion(response: nil, error: ErrorResponse.Error(response.response?.statusCode ?? 500, response.data, response.result.error!))
->>>>>>> upstream/master
                     return
                 }
 
                 if () is T {
-                    completion(Response(response: response.response!, body: () as! T), nil)
+                    completion(response: Response(response: response.response!, body: () as! T), error: nil)
                     return
                 }
-                if let json: Any = response.result.value {
-                    let body = Decoders.decode(clazz: T.self, source: json as AnyObject)
-                    completion(Response(response: response.response!, body: body), nil)
+                if let json: AnyObject = response.result.value {
+                    let body = Decoders.decode(clazz: T.self, source: json)
+                    completion(response: Response(response: response.response!, body: body), error: nil)
                     return
                 } else if "" is T {
                     // swagger-parser currently doesn't support void, which will be fixed in future swagger-parser release
                     // https://github.com/swagger-api/swagger-parser/pull/34
-                    completion(Response(response: response.response!, body: "" as! T), nil)
+                    completion(response: Response(response: response.response!, body: "" as! T), error: nil)
                     return
                 }
 
-<<<<<<< HEAD
-                completion(nil, ErrorResponse.Error(500, nil, NSError(domain: "localhost", code: 500, userInfo: ["reason": "unreacheable code"])))
-=======
                 completion(response: nil, error: ErrorResponse.Error(500, nil, NSError(domain: "localhost", code: 500, userInfo: ["reason": "unreacheable code"])))
->>>>>>> upstream/master
             }
         }
     }
 
-    private func buildHeaders() -> [String: String] {
-        var httpHeaders = SessionManager.defaultHTTPHeaders
+    private func buildHeaders() -> [String: AnyObject] {
+        var httpHeaders = Manager.defaultHTTPHeaders
         for (key, value) in self.headers {
             httpHeaders[key] = value
         }

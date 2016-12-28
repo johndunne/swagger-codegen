@@ -8,70 +8,70 @@
 
 import Foundation
 
-class WithLatestFromSink<FirstType, SecondType, ResultType, O: ObserverType>
+class WithLatestFromSink<FirstType, SecondType, ResultType, O: ObserverType where O.E == ResultType>
     : Sink<O>
     , ObserverType
     , LockOwnerType
-    , SynchronizedOnType where O.E == ResultType {
+    , SynchronizedOnType {
 
     typealias Parent = WithLatestFrom<FirstType, SecondType, ResultType>
     typealias E = FirstType
-    
-    fileprivate let _parent: Parent
-    
+
+    private let _parent: Parent
+
     var _lock = NSRecursiveLock()
-    fileprivate var _latest: SecondType?
+    private var _latest: SecondType?
 
     init(parent: Parent, observer: O) {
         _parent = parent
-        
+
         super.init(observer: observer)
     }
-    
+
     func run() -> Disposable {
         let sndSubscription = SingleAssignmentDisposable()
         let sndO = WithLatestFromSecond(parent: self, disposable: sndSubscription)
-        
+
         sndSubscription.disposable = _parent._second.subscribe(sndO)
         let fstSubscription = _parent._first.subscribe(self)
-        
-        return Disposables.create(fstSubscription, sndSubscription)
+
+        return StableCompositeDisposable.create(fstSubscription, sndSubscription)
     }
 
-    func on(_ event: Event<E>) {
+    func on(event: Event<E>) {
         synchronizedOn(event)
     }
 
-    func _synchronized_on(_ event: Event<E>) {
+    func _synchronized_on(event: Event<E>) {
         switch event {
-        case let .next(value):
+        case let .Next(value):
             guard let latest = _latest else { return }
             do {
                 let res = try _parent._resultSelector(value, latest)
-                
-                forwardOn(.next(res))
+
+                forwardOn(.Next(res))
             } catch let e {
-                forwardOn(.error(e))
+                forwardOn(.Error(e))
                 dispose()
             }
-        case .completed:
-            forwardOn(.completed)
+        case .Completed:
+            forwardOn(.Completed)
             dispose()
-        case let .error(error):
-            forwardOn(.error(error))
+        case let .Error(error):
+            forwardOn(.Error(error))
             dispose()
         }
     }
 }
 
-class WithLatestFromSecond<FirstType, SecondType, ResultType, O: ObserverType>
+class WithLatestFromSecond<FirstType, SecondType, ResultType, O: ObserverType where O.E == ResultType>
     : ObserverType
     , LockOwnerType
-    , SynchronizedOnType where O.E == ResultType {
-    
+    , SynchronizedOnType {
+
     typealias Parent = WithLatestFromSink<FirstType, SecondType, ResultType, O>
     typealias E = SecondType
-    
+
     private let _parent: Parent
     private let _disposable: Disposable
 
@@ -83,19 +83,19 @@ class WithLatestFromSecond<FirstType, SecondType, ResultType, O: ObserverType>
         _parent = parent
         _disposable = disposable
     }
-    
-    func on(_ event: Event<E>) {
+
+    func on(event: Event<E>) {
         synchronizedOn(event)
     }
 
-    func _synchronized_on(_ event: Event<E>) {
+    func _synchronized_on(event: Event<E>) {
         switch event {
-        case let .next(value):
+        case let .Next(value):
             _parent._latest = value
-        case .completed:
+        case .Completed:
             _disposable.dispose()
-        case let .error(error):
-            _parent.forwardOn(.error(error))
+        case let .Error(error):
+            _parent.forwardOn(.Error(error))
             _parent.dispose()
         }
     }
@@ -103,18 +103,18 @@ class WithLatestFromSecond<FirstType, SecondType, ResultType, O: ObserverType>
 
 class WithLatestFrom<FirstType, SecondType, ResultType>: Producer<ResultType> {
     typealias ResultSelector = (FirstType, SecondType) throws -> ResultType
-    
-    fileprivate let _first: Observable<FirstType>
-    fileprivate let _second: Observable<SecondType>
-    fileprivate let _resultSelector: ResultSelector
 
-    init(first: Observable<FirstType>, second: Observable<SecondType>, resultSelector: @escaping ResultSelector) {
+    private let _first: Observable<FirstType>
+    private let _second: Observable<SecondType>
+    private let _resultSelector: ResultSelector
+
+    init(first: Observable<FirstType>, second: Observable<SecondType>, resultSelector: ResultSelector) {
         _first = first
         _second = second
         _resultSelector = resultSelector
     }
-    
-    override func run<O : ObserverType>(_ observer: O) -> Disposable where O.E == ResultType {
+
+    override func run<O : ObserverType where O.E == ResultType>(observer: O) -> Disposable {
         let sink = WithLatestFromSink(parent: self, observer: observer)
         sink.disposable = sink.run()
         return sink

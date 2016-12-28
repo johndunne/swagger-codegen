@@ -7,19 +7,9 @@
 import Foundation
 
 protocol JSONEncodable {
-    func encodeToJSON() -> Any
+    func encodeToJSON() -> AnyObject
 }
 
-<<<<<<< HEAD
-public enum ErrorResponse : Error {
-    case Error(Int, Data?, Error)
-}
-
-open class Response<T> {
-    open let statusCode: Int
-    open let header: [String: String]
-    open let body: T?
-=======
 public enum ErrorResponse : ErrorType {
     case Error(Int, NSData?, ErrorType)
 }
@@ -28,7 +18,6 @@ public class Response<T> {
     public let statusCode: Int
     public let header: [String: String]
     public let body: T?
->>>>>>> upstream/master
 
     public init(statusCode: Int, header: [String: String], body: T?) {
         self.statusCode = statusCode
@@ -36,11 +25,7 @@ public class Response<T> {
         self.body = body
     }
 
-<<<<<<< HEAD
-    public convenience init(response: HTTPURLResponse, body: T?) {
-=======
     public convenience init(response: NSHTTPURLResponse, body: T?) {
->>>>>>> upstream/master
         let rawHeader = response.allHeaderFields
         var header = [String:String]()
         for (key, value) in rawHeader {
@@ -50,21 +35,21 @@ public class Response<T> {
     }
 }
 
-private var once = Int()
+private var once = dispatch_once_t()
 class Decoders {
-    static fileprivate var decoders = Dictionary<String, ((AnyObject) -> AnyObject)>()
+    static private var decoders = Dictionary<String, ((AnyObject) -> AnyObject)>()
 
-    static func addDecoder<T>(clazz: T.Type, decoder: @escaping ((AnyObject) -> T)) {
+    static func addDecoder<T>(clazz clazz: T.Type, decoder: ((AnyObject) -> T)) {
         let key = "\(T.self)"
-        decoders[key] = { decoder($0) as AnyObject }
+        decoders[key] = { decoder($0) as! AnyObject }
     }
 
-    static func decode<T>(clazz: [T].Type, source: AnyObject) -> [T] {
+    static func decode<T>(clazz clazz: [T].Type, source: AnyObject) -> [T] {
         let array = source as! [AnyObject]
         return array.map { Decoders.decode(clazz: T.self, source: $0) }
     }
 
-    static func decode<T, Key: Hashable>(clazz: [Key:T].Type, source: AnyObject) -> [Key:T] {
+    static func decode<T, Key: Hashable>(clazz clazz: [Key:T].Type, source: AnyObject) -> [Key:T] {
         let sourceDictionary = source as! [Key: AnyObject]
         var dictionary = [Key:T]()
         for (key, value) in sourceDictionary {
@@ -73,22 +58,22 @@ class Decoders {
         return dictionary
     }
 
-    static func decode<T>(clazz: T.Type, source: AnyObject) -> T {
+    static func decode<T>(clazz clazz: T.Type, source: AnyObject) -> T {
         initialize()
         if T.self is Int32.Type && source is NSNumber {
-            return source.int32Value as! T;
+            return source.intValue as! T;
         }
         if T.self is Int64.Type && source is NSNumber {
-            return source.int64Value as! T;
+            return source.longLongValue as! T;
         }
         if T.self is NSUUID.Type && source is String {
-            return NSUUID(uuidString: source as! String) as! T
+            return NSUUID(UUIDString: source as! String) as! T
         }
         if source is T {
             return source as! T
         }
-        if T.self is Data.Type && source is String {
-            return Data(base64Encoded: source as! String) as! T
+        if T.self is NSData.Type && source is String {
+            return NSData(base64EncodedString: source as! String, options: NSDataBase64DecodingOptions()) as! T
         }
 
         let key = "\(T.self)"
@@ -99,7 +84,7 @@ class Decoders {
         }
     }
 
-    static func decodeOptional<T>(clazz: T.Type, source: AnyObject?) -> T? {
+    static func decodeOptional<T>(clazz clazz: T.Type, source: AnyObject?) -> T? {
         if source is NSNull {
             return nil
         }
@@ -108,7 +93,7 @@ class Decoders {
         }
     }
 
-    static func decodeOptional<T>(clazz: [T].Type, source: AnyObject?) -> [T]? {
+    static func decodeOptional<T>(clazz clazz: [T].Type, source: AnyObject?) -> [T]? {
         if source is NSNull {
             return nil
         }
@@ -117,7 +102,7 @@ class Decoders {
         }
     }
 
-    static func decodeOptional<T, Key: Hashable>(clazz: [Key:T].Type, source: AnyObject?) -> [Key:T]? {
+    static func decodeOptional<T, Key: Hashable>(clazz clazz: [Key:T].Type, source: AnyObject?) -> [Key:T]? {
         if source is NSNull {
             return nil
         }
@@ -126,30 +111,32 @@ class Decoders {
         }
     }
 
-    private static var __once: () = {
+    static private func initialize() {
+        dispatch_once(&once) {
             let formatters = [
                 "yyyy-MM-dd",
                 "yyyy-MM-dd'T'HH:mm:ssZZZZZ",
                 "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
                 "yyyy-MM-dd'T'HH:mm:ss'Z'",
                 "yyyy-MM-dd'T'HH:mm:ss.SSS"
-            ].map { (format: String) -> DateFormatter in
-                let formatter = DateFormatter()
+            ].map { (format: String) -> NSDateFormatter in
+                let formatter = NSDateFormatter()
                 formatter.dateFormat = format
                 return formatter
             }
-            // Decoder for Date
-            Decoders.addDecoder(clazz: Date.self) { (source: AnyObject) -> Date in
+            // Decoder for NSDate
+            Decoders.addDecoder(clazz: NSDate.self) { (source: AnyObject) -> NSDate in
                if let sourceString = source as? String {
                     for formatter in formatters {
-                        if let date = formatter.date(from: sourceString) {
+                        if let date = formatter.dateFromString(sourceString) {
                             return date
                         }
                     }
+
                 }
                 if let sourceInt = source as? Int {
                     // treat as a java date
-                    return Date(timeIntervalSince1970: Double(sourceInt / 1000) )
+                    return NSDate(timeIntervalSince1970: Double(sourceInt / 1000) )
                 }
                 fatalError("formatter failed to parse \(source)")
             } 
@@ -160,10 +147,10 @@ class Decoders {
             }
             // Decoder for Category
             Decoders.addDecoder(clazz: Category.self) { (source: AnyObject) -> Category in
-                let sourceDictionary = source as! [AnyHashable: Any]
+                let sourceDictionary = source as! [NSObject:AnyObject]
                 let instance = Category()
-                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
-                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"] as AnyObject?)
+                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
+                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"])
                 return instance
             }
 
@@ -174,23 +161,14 @@ class Decoders {
             }
             // Decoder for Order
             Decoders.addDecoder(clazz: Order.self) { (source: AnyObject) -> Order in
-                let sourceDictionary = source as! [AnyHashable: Any]
+                let sourceDictionary = source as! [NSObject:AnyObject]
                 let instance = Order()
-<<<<<<< HEAD
-                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
-                instance.petId = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["petId"] as AnyObject?)
-                instance.quantity = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["quantity"] as AnyObject?)
-                instance.shipDate = Decoders.decodeOptional(clazz: Date.self, source: sourceDictionary["shipDate"] as AnyObject?)
-                instance.status = Order.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
-                instance.complete = Decoders.decodeOptional(clazz: Bool.self, source: sourceDictionary["complete"] as AnyObject?)
-=======
                 instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
                 instance.petId = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["petId"])
                 instance.quantity = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["quantity"])
                 instance.shipDate = Decoders.decodeOptional(clazz: NSDate.self, source: sourceDictionary["shipDate"])
                 instance.status = Order.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
                 instance.complete = Decoders.decodeOptional(clazz: Bool.self, source: sourceDictionary["complete"])
->>>>>>> upstream/master
                 return instance
             }
 
@@ -201,21 +179,13 @@ class Decoders {
             }
             // Decoder for Pet
             Decoders.addDecoder(clazz: Pet.self) { (source: AnyObject) -> Pet in
-                let sourceDictionary = source as! [AnyHashable: Any]
+                let sourceDictionary = source as! [NSObject:AnyObject]
                 let instance = Pet()
-<<<<<<< HEAD
-                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
-                instance.category = Decoders.decodeOptional(clazz: Category.self, source: sourceDictionary["category"] as AnyObject?)
-                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"] as AnyObject?)
-                instance.photoUrls = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["photoUrls"] as AnyObject?)
-                instance.tags = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["tags"] as AnyObject?)
-=======
                 instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
                 instance.category = Decoders.decodeOptional(clazz: Category.self, source: sourceDictionary["category"])
                 instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"])
                 instance.photoUrls = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["photoUrls"])
                 instance.tags = Decoders.decodeOptional(clazz: Array.self, source: sourceDictionary["tags"])
->>>>>>> upstream/master
                 instance.status = Pet.Status(rawValue: (sourceDictionary["status"] as? String) ?? "") 
                 return instance
             }
@@ -227,10 +197,10 @@ class Decoders {
             }
             // Decoder for Tag
             Decoders.addDecoder(clazz: Tag.self) { (source: AnyObject) -> Tag in
-                let sourceDictionary = source as! [AnyHashable: Any]
+                let sourceDictionary = source as! [NSObject:AnyObject]
                 let instance = Tag()
-                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
-                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"] as AnyObject?)
+                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
+                instance.name = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["name"])
                 return instance
             }
 
@@ -241,21 +211,18 @@ class Decoders {
             }
             // Decoder for User
             Decoders.addDecoder(clazz: User.self) { (source: AnyObject) -> User in
-                let sourceDictionary = source as! [AnyHashable: Any]
+                let sourceDictionary = source as! [NSObject:AnyObject]
                 let instance = User()
-                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"] as AnyObject?)
-                instance.username = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["username"] as AnyObject?)
-                instance.firstName = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["firstName"] as AnyObject?)
-                instance.lastName = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["lastName"] as AnyObject?)
-                instance.email = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["email"] as AnyObject?)
-                instance.password = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["password"] as AnyObject?)
-                instance.phone = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["phone"] as AnyObject?)
-                instance.userStatus = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["userStatus"] as AnyObject?)
+                instance.id = Decoders.decodeOptional(clazz: Int64.self, source: sourceDictionary["id"])
+                instance.username = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["username"])
+                instance.firstName = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["firstName"])
+                instance.lastName = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["lastName"])
+                instance.email = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["email"])
+                instance.password = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["password"])
+                instance.phone = Decoders.decodeOptional(clazz: String.self, source: sourceDictionary["phone"])
+                instance.userStatus = Decoders.decodeOptional(clazz: Int32.self, source: sourceDictionary["userStatus"])
                 return instance
             }
-    }()
-
-    static fileprivate func initialize() {
-        _ = Decoders.__once
+        }
     }
 }

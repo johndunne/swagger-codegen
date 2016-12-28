@@ -11,7 +11,7 @@ import Foundation
 /**
     Represents a disposable resource that only disposes its underlying disposable resource when all dependent disposable objects have been disposed.
  */
-public final class RefCountDisposable : DisposeBase, Cancelable {
+public class RefCountDisposable : DisposeBase, Cancelable {
     private var _lock = SpinLock()
     private var _disposable = nil as Disposable?
     private var _primaryDisposed = false
@@ -20,7 +20,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
     /**
      - returns: Was resource disposed.
      */
-    public var isDisposed: Bool {
+    public var disposed: Bool {
         _lock.lock(); defer { _lock.unlock() }
         return _disposable == nil
     }
@@ -43,14 +43,14 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
             if let _ = _disposable {
 
                 do {
-                    let _ = try incrementChecked(&_count)
+                    try incrementChecked(&_count)
                 } catch (_) {
                     rxFatalError("RefCountDisposable increment failed")
                 }
 
                 return RefCountInnerDisposable(self)
             } else {
-                return Disposables.create()
+                return NopDisposable.instance
             }
         }
     }
@@ -60,7 +60,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
      */
     public func dispose() {
         let oldDisposable: Disposable? = _lock.calculateLocked {
-            if let oldDisposable = _disposable, !_primaryDisposed
+            if let oldDisposable = _disposable where !_primaryDisposed
             {
                 _primaryDisposed = true
 
@@ -79,11 +79,11 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
         }
     }
 
-    fileprivate func release() {
+    private func release() {
         let oldDisposable: Disposable? = _lock.calculateLocked {
             if let oldDisposable = _disposable {
                 do {
-                    let _ = try decrementChecked(&_count)
+                    try decrementChecked(&_count)
                 } catch (_) {
                     rxFatalError("RefCountDisposable decrement on release failed")
                 }
@@ -110,7 +110,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
 internal final class RefCountInnerDisposable: DisposeBase, Disposable
 {
     private let _parent: RefCountDisposable
-    private var _isDisposed: AtomicInt = 0
+    private var _disposed: AtomicInt = 0
 
     init(_ parent: RefCountDisposable)
     {
@@ -120,7 +120,7 @@ internal final class RefCountInnerDisposable: DisposeBase, Disposable
 
     internal func dispose()
     {
-        if AtomicCompareAndSwap(0, 1, &_isDisposed) {
+        if AtomicCompareAndSwap(0, 1, &_disposed) {
             _parent.release()
         }
     }

@@ -10,16 +10,16 @@ import RxSwift
 
 
 
-open class StoreAPI: APIBase {
+public class StoreAPI: APIBase {
     /**
      Delete purchase order by ID
      
      - parameter orderId: (path) ID of the order that needs to be deleted 
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func deleteOrder(orderId orderId: String, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func deleteOrder(orderId orderId: String, completion: ((error: ErrorType?) -> Void)) {
         deleteOrderWithRequestBuilder(orderId: orderId).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -29,15 +29,15 @@ open class StoreAPI: APIBase {
      - parameter orderId: (path) ID of the order that needs to be deleted 
      - returns: Observable<Void>
      */
-    open class func deleteOrder(orderId orderId: String) -> Observable<Void> {
+    public class func deleteOrder(orderId orderId: String) -> Observable<Void> {
         return Observable.create { observer -> Disposable in
             deleteOrder(orderId: orderId) { error in
                 if let error = error {
-                    observer.on(.error(error as Error))
+                    observer.on(.Error(error as ErrorType))
                 } else {
-                    observer.on(.next())
+                    observer.on(.Next())
                 }
-                observer.on(.completed)
+                observer.on(.Completed)
             }
             return NopDisposable.instance
         }
@@ -52,16 +52,12 @@ open class StoreAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func deleteOrderWithRequestBuilder(orderId orderId: String) -> RequestBuilder<Void> {
+    public class func deleteOrderWithRequestBuilder(orderId orderId: String) -> RequestBuilder<Void> {
         var path = "/store/order/{orderId}"
-        path = path.replacingOccurrences(of: "{orderId}", with: "\(orderId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{orderId}", withString: "\(orderId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-<<<<<<< HEAD
-        let nillableParameters: [String:Any?] = [:]
-=======
         let nillableParameters: [String:AnyObject?] = [:]
->>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -77,9 +73,9 @@ open class StoreAPI: APIBase {
      
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func getInventory(completion: @escaping ((_ data: [String:Int32]?,_ error: Error?) -> Void)) {
+    public class func getInventory(completion: ((data: [String:Int32]?, error: ErrorType?) -> Void)) {
         getInventoryWithRequestBuilder().execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -88,15 +84,15 @@ open class StoreAPI: APIBase {
      
      - returns: Observable<[String:Int32]>
      */
-    open class func getInventory() -> Observable<[String:Int32]> {
+    public class func getInventory() -> Observable<[String:Int32]> {
         return Observable.create { observer -> Disposable in
             getInventory() { data, error in
                 if let error = error {
-                    observer.on(.error(error as Error))
+                    observer.on(.Error(error as ErrorType))
                 } else {
-                    observer.on(.next(data!))
+                    observer.on(.Next(data!))
                 }
-                observer.on(.completed)
+                observer.on(.Completed)
             }
             return NopDisposable.instance
         }
@@ -109,24 +105,20 @@ open class StoreAPI: APIBase {
      - API Key:
        - type: apiKey api_key 
        - name: api_key
-     - examples: [{contentType=application/json, example={
+     - examples: [{example={
   "key" : 123
-}}, {contentType=application/xml, example=not implemented io.swagger.models.properties.MapProperty@d1e580af}]
-     - examples: [{contentType=application/json, example={
+}, contentType=application/json}, {example=not implemented io.swagger.models.properties.MapProperty@d1e580af, contentType=application/xml}]
+     - examples: [{example={
   "key" : 123
-}}, {contentType=application/xml, example=not implemented io.swagger.models.properties.MapProperty@d1e580af}]
+}, contentType=application/json}, {example=not implemented io.swagger.models.properties.MapProperty@d1e580af, contentType=application/xml}]
 
      - returns: RequestBuilder<[String:Int32]> 
      */
-    open class func getInventoryWithRequestBuilder() -> RequestBuilder<[String:Int32]> {
+    public class func getInventoryWithRequestBuilder() -> RequestBuilder<[String:Int32]> {
         let path = "/store/inventory"
         let URLString = PetstoreClientAPI.basePath + path
 
-<<<<<<< HEAD
-        let nillableParameters: [String:Any?] = [:]
-=======
         let nillableParameters: [String:AnyObject?] = [:]
->>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -143,9 +135,9 @@ open class StoreAPI: APIBase {
      - parameter orderId: (path) ID of pet that needs to be fetched 
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func getOrderById(orderId orderId: String, completion: @escaping ((_ data: Order?,_ error: Error?) -> Void)) {
+    public class func getOrderById(orderId orderId: String, completion: ((data: Order?, error: ErrorType?) -> Void)) {
         getOrderByIdWithRequestBuilder(orderId: orderId).execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -155,15 +147,15 @@ open class StoreAPI: APIBase {
      - parameter orderId: (path) ID of pet that needs to be fetched 
      - returns: Observable<Order>
      */
-    open class func getOrderById(orderId orderId: String) -> Observable<Order> {
+    public class func getOrderById(orderId orderId: String) -> Observable<Order> {
         return Observable.create { observer -> Disposable in
             getOrderById(orderId: orderId) { data, error in
                 if let error = error {
-                    observer.on(.error(error as Error))
+                    observer.on(.Error(error as ErrorType))
                 } else {
-                    observer.on(.next(data!))
+                    observer.on(.Next(data!))
                 }
-                observer.on(.completed)
+                observer.on(.Completed)
             }
             return NopDisposable.instance
         }
@@ -173,55 +165,47 @@ open class StoreAPI: APIBase {
      Find purchase order by ID
      - GET /store/order/{orderId}
      - For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
-     - examples: [{contentType=application/json, example={
-  "petId" : 123456789,
-  "quantity" : 123,
+     - examples: [{example={
   "id" : 123456789,
-  "shipDate" : "2000-01-23T04:56:07.000+00:00",
+  "petId" : 123456789,
   "complete" : true,
-  "status" : "aeiou"
-}}, {contentType=application/xml, example=<Order>
+  "status" : "aeiou",
+  "quantity" : 123,
+  "shipDate" : "2000-01-23T04:56:07.000+00:00"
+}, contentType=application/json}, {example=<Order>
   <id>123456</id>
   <petId>123456</petId>
   <quantity>0</quantity>
   <shipDate>2000-01-23T04:56:07.000Z</shipDate>
   <status>string</status>
   <complete>true</complete>
-</Order>}]
-     - examples: [{contentType=application/json, example={
-  "petId" : 123456789,
-  "quantity" : 123,
-  "id" : 123456789,
-  "shipDate" : "2000-01-23T04:56:07.000+00:00",
-  "complete" : true,
-  "status" : "aeiou"
-}}, {contentType=application/xml, example=<Order>
-  <id>123456</id>
-  <petId>123456</petId>
-  <quantity>0</quantity>
-  <shipDate>2000-01-23T04:56:07.000Z</shipDate>
-  <status>string</status>
-  <complete>true</complete>
-<<<<<<< HEAD
-</Order>}]
-=======
 </Order>, contentType=application/xml}]
->>>>>>> upstream/master
+     - examples: [{example={
+  "id" : 123456789,
+  "petId" : 123456789,
+  "complete" : true,
+  "status" : "aeiou",
+  "quantity" : 123,
+  "shipDate" : "2000-01-23T04:56:07.000+00:00"
+}, contentType=application/json}, {example=<Order>
+  <id>123456</id>
+  <petId>123456</petId>
+  <quantity>0</quantity>
+  <shipDate>2000-01-23T04:56:07.000Z</shipDate>
+  <status>string</status>
+  <complete>true</complete>
+</Order>, contentType=application/xml}]
      
      - parameter orderId: (path) ID of pet that needs to be fetched 
 
      - returns: RequestBuilder<Order> 
      */
-    open class func getOrderByIdWithRequestBuilder(orderId orderId: String) -> RequestBuilder<Order> {
+    public class func getOrderByIdWithRequestBuilder(orderId orderId: String) -> RequestBuilder<Order> {
         var path = "/store/order/{orderId}"
-        path = path.replacingOccurrences(of: "{orderId}", with: "\(orderId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{orderId}", withString: "\(orderId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-<<<<<<< HEAD
-        let nillableParameters: [String:Any?] = [:]
-=======
         let nillableParameters: [String:AnyObject?] = [:]
->>>>>>> upstream/master
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -238,9 +222,9 @@ open class StoreAPI: APIBase {
      - parameter body: (body) order placed for purchasing the pet (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func placeOrder(body body: Order? = nil, completion: @escaping ((_ data: Order?,_ error: Error?) -> Void)) {
+    public class func placeOrder(body body: Order? = nil, completion: ((data: Order?, error: ErrorType?) -> Void)) {
         placeOrderWithRequestBuilder(body: body).execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -250,15 +234,15 @@ open class StoreAPI: APIBase {
      - parameter body: (body) order placed for purchasing the pet (optional)
      - returns: Observable<Order>
      */
-    open class func placeOrder(body body: Order? = nil) -> Observable<Order> {
+    public class func placeOrder(body body: Order? = nil) -> Observable<Order> {
         return Observable.create { observer -> Disposable in
             placeOrder(body: body) { data, error in
                 if let error = error {
-                    observer.on(.error(error as Error))
+                    observer.on(.Error(error as ErrorType))
                 } else {
-                    observer.on(.next(data!))
+                    observer.on(.Next(data!))
                 }
-                observer.on(.completed)
+                observer.on(.Completed)
             }
             return NopDisposable.instance
         }
@@ -268,51 +252,42 @@ open class StoreAPI: APIBase {
      Place an order for a pet
      - POST /store/order
      - 
-<<<<<<< HEAD
-     - examples: [{contentType=application/json, example={
-=======
      - examples: [{example={
   "id" : 123456789,
->>>>>>> upstream/master
   "petId" : 123456789,
-  "quantity" : 123,
-  "id" : 123456789,
-  "shipDate" : "2000-01-23T04:56:07.000+00:00",
   "complete" : true,
-  "status" : "aeiou"
-}}, {contentType=application/xml, example=<Order>
+  "status" : "aeiou",
+  "quantity" : 123,
+  "shipDate" : "2000-01-23T04:56:07.000+00:00"
+}, contentType=application/json}, {example=<Order>
   <id>123456</id>
   <petId>123456</petId>
   <quantity>0</quantity>
   <shipDate>2000-01-23T04:56:07.000Z</shipDate>
   <status>string</status>
   <complete>true</complete>
-</Order>}]
-     - examples: [{contentType=application/json, example={
-  "petId" : 123456789,
-  "quantity" : 123,
-  "id" : 123456789,
-  "shipDate" : "2000-01-23T04:56:07.000+00:00",
-  "complete" : true,
-  "status" : "aeiou"
-}}, {contentType=application/xml, example=<Order>
-  <id>123456</id>
-  <petId>123456</petId>
-  <quantity>0</quantity>
-  <shipDate>2000-01-23T04:56:07.000Z</shipDate>
-  <status>string</status>
-  <complete>true</complete>
-<<<<<<< HEAD
-</Order>}]
-=======
 </Order>, contentType=application/xml}]
->>>>>>> upstream/master
+     - examples: [{example={
+  "id" : 123456789,
+  "petId" : 123456789,
+  "complete" : true,
+  "status" : "aeiou",
+  "quantity" : 123,
+  "shipDate" : "2000-01-23T04:56:07.000+00:00"
+}, contentType=application/json}, {example=<Order>
+  <id>123456</id>
+  <petId>123456</petId>
+  <quantity>0</quantity>
+  <shipDate>2000-01-23T04:56:07.000Z</shipDate>
+  <status>string</status>
+  <complete>true</complete>
+</Order>, contentType=application/xml}]
      
      - parameter body: (body) order placed for purchasing the pet (optional)
 
      - returns: RequestBuilder<Order> 
      */
-    open class func placeOrderWithRequestBuilder(body body: Order? = nil) -> RequestBuilder<Order> {
+    public class func placeOrderWithRequestBuilder(body body: Order? = nil) -> RequestBuilder<Order> {
         let path = "/store/order"
         let URLString = PetstoreClientAPI.basePath + path
         let parameters = body?.encodeToJSON() as? [String:AnyObject]

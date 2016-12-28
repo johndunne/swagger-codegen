@@ -1,10 +1,5 @@
 package main
 
-/**
-* Generated automatically from swagger-codegen. Don't edit here! There's no point :)
-**/
-
-
 import (
 	// WARNING!
 	// Change this to a fully-qualified import path
@@ -13,13 +8,15 @@ import (
 	//
 	//    sw "github.com/myname/myrepo/{{apiPath}}"
 	//
-    "{{project_name}}"
+	sw "./{{apiPath}}"
 	"log"
+	"net/http"
 )
 
 func main() {
-    log.Printf("Server started")
+	log.Printf("Server started")
 
-    m := api.NewRouter()
-    m.Run(":{{listen_port}}")
+	router := sw.NewRouter()
+	
+	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
 }

@@ -11,7 +11,7 @@ import Foundation
 struct AnonymousInvocable : InvocableType {
     private let _action: () -> ()
 
-    init(_ action: @escaping () -> ()) {
+    init(_ action: () -> ()) {
         _action = action
     }
 

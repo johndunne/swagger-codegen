@@ -25,7 +25,7 @@ class UserAPITests: XCTestCase {
     }
     
     func testLogin() {
-        let expectation = self.expectation(description: "testLogin")
+        let expectation = self.expectationWithDescription("testLogin")
         
         UserAPI.loginUser(username: "swiftTester", password: "swift") { (_, error) in
             guard error == nil else {
@@ -36,11 +36,11 @@ class UserAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func testLogout() {
-        let expectation = self.expectation(description: "testLogout")
+        let expectation = self.expectationWithDescription("testLogout")
         
         UserAPI.logoutUser { (error) in
             guard error == nil else {
@@ -51,11 +51,11 @@ class UserAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test1CreateUser() {
-        let expectation = self.expectation(description: "testCreateUser")
+        let expectation = self.expectationWithDescription("testCreateUser")
         
         let newUser = User()
         newUser.email = "test@test.com"
@@ -76,11 +76,11 @@ class UserAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test2GetUser() {
-        let expectation = self.expectation(description: "testGetUser")
+        let expectation = self.expectationWithDescription("testGetUser")
         
         UserAPI.getUserByName(username: "test@test.com") { (user, error) in
             guard error == nil else {
@@ -100,11 +100,11 @@ class UserAPITests: XCTestCase {
             }
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test3DeleteUser() {
-        let expectation = self.expectation(description: "testDeleteUser")
+        let expectation = self.expectationWithDescription("testDeleteUser")
         
         UserAPI.deleteUser(username: "test@test.com") { (error) in
             guard error == nil else {
@@ -115,7 +115,7 @@ class UserAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }

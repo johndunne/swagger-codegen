@@ -17,8 +17,8 @@ class StoreAPITests: XCTestCase {
     let testTimeout = 10.0
 
     func test1PlaceOrder() {
-        let expectation = self.expectation(description: "testPlaceOrder")
-        let shipDate = Date()
+        let expectation = self.expectationWithDescription("testPlaceOrder")
+        let shipDate = NSDate()
         
         let newOrder = Order()
         newOrder.id = 1000
@@ -46,11 +46,11 @@ class StoreAPITests: XCTestCase {
             }
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test2GetOrder() {
-        let expectation = self.expectation(description: "testGetOrder")
+        let expectation = self.expectationWithDescription("testGetOrder")
         
         StoreAPI.getOrderById(orderId: "1000") { (order, error) in
             guard error == nil else {
@@ -67,11 +67,11 @@ class StoreAPITests: XCTestCase {
             }
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test3DeleteOrder() {
-        let expectation = self.expectation(description: "testDeleteOrder")
+        let expectation = self.expectationWithDescription("testDeleteOrder")
         
         StoreAPI.deleteOrder(orderId: "1000") { (error) in
             guard error == nil else {
@@ -82,12 +82,12 @@ class StoreAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testDownloadProgress() {
-        let responseExpectation = self.expectation(description: "obtain response")
-        let progressExpectation = self.expectation(description: "obtain progress")
+        let responseExpectation = self.expectationWithDescription("obtain response")
+        let progressExpectation = self.expectationWithDescription("obtain progress")
         let requestBuilder = StoreAPI.getOrderByIdWithRequestBuilder(orderId: "1000")
 
         requestBuilder.onProgressReady = { (progress) in
@@ -98,12 +98,12 @@ class StoreAPITests: XCTestCase {
             responseExpectation.fulfill()
         }
 
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }
 
-private extension Date {
+private extension NSDate {
 
     /**
      Returns true if the dates are equal given the format string.
@@ -113,10 +113,10 @@ private extension Date {
 
      - returns: true if the dates are equal, given the format string.
      */
-    func isEqual(_ date: Date, format: String) -> Bool {
-        let fmt = DateFormatter()
+    func isEqual(date: NSDate, format: String) -> Bool {
+        let fmt = NSDateFormatter()
         fmt.dateFormat = format
-        return fmt.string(from: self).isEqual(fmt.string(from: date))
+        return fmt.stringFromDate(self).isEqual(fmt.stringFromDate(date))
     }
 
 }

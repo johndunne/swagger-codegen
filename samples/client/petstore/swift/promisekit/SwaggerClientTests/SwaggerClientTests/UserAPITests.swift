@@ -16,23 +16,23 @@ class UserAPITests: XCTestCase {
     let testTimeout = 10.0
         
     func testLogin() {
-        let expectation = self.expectation(description: "testLogin")
+        let expectation = self.expectationWithDescription("testLogin")
         UserAPI.loginUser(username: "swiftTester", password: "swift").then { _ -> Void in
                 expectation.fulfill()
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func testLogout() {
-        let expectation = self.expectation(description: "testLogout")
+        let expectation = self.expectationWithDescription("testLogout")
         UserAPI.logoutUser().then {
             expectation.fulfill()
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test1CreateUser() {
-        let expectation = self.expectation(description: "testCreateUser")
+        let expectation = self.expectationWithDescription("testCreateUser")
         let newUser = User()
         newUser.email = "test@test.com"
         newUser.firstName = "Test"
@@ -45,11 +45,11 @@ class UserAPITests: XCTestCase {
         UserAPI.createUser(body: newUser).then {
             expectation.fulfill()
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test2GetUser() {
-        let expectation = self.expectation(description: "testGetUser")
+        let expectation = self.expectationWithDescription("testGetUser")
         UserAPI.getUserByName(username: "test@test.com").then {user -> Void in
                 XCTAssert(user.userStatus == 0, "invalid userStatus")
                 XCTAssert(user.email == "test@test.com", "invalid email")
@@ -60,18 +60,18 @@ class UserAPITests: XCTestCase {
                 expectation.fulfill()
             }.always {
                 // Noop for now
-            }.catch { errorType in
+            }.error { errorType -> Void in
                 XCTFail("error getting user")
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test3DeleteUser() {
-        let expectation = self.expectation(description: "testDeleteUser")
+        let expectation = self.expectationWithDescription("testDeleteUser")
         UserAPI.deleteUser(username: "test@test.com").then {
             expectation.fulfill()
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }

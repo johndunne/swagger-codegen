@@ -2163,12 +2163,6 @@ public class DefaultCodegen {
         op.isRestfulDestroy = op.isRestfulDestroy();
         op.isRestful = op.isRestful();
 
-        op.requestOperation = "GET".equalsIgnoreCase(op.httpMethod);
-        op.createOperation = "POST".equalsIgnoreCase(op.httpMethod);
-        op.updateOperation = "PUT".equalsIgnoreCase(op.httpMethod);
-        op.destroyOperation = "DELETE".equalsIgnoreCase(op.httpMethod);
-        op.createOrUpdateOperation = op.createOperation || op.updateOperation;
-
         return op;
     }
 

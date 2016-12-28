@@ -9,11 +9,11 @@
 import Foundation
 
 protocol SynchronizedSubscribeType : class, ObservableType, Lock {
-    func _synchronized_subscribe<O: ObserverType>(_ observer: O) -> Disposable where O.E == E
+    func _synchronized_subscribe<O: ObserverType where O.E == E>(observer: O) -> Disposable
 }
 
 extension SynchronizedSubscribeType {
-    func synchronizedSubscribe<O: ObserverType>(_ observer: O) -> Disposable where O.E == E {
+    func synchronizedSubscribe<O: ObserverType where O.E == E>(observer: O) -> Disposable {
         lock(); defer { unlock() }
         return _synchronized_subscribe(observer)
     }

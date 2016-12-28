@@ -10,17 +10,17 @@ import Foundation
 
 let dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
 
-func logEvent(_ identifier: String, dateFormat: DateFormatter, content: String) {
-    print("\(dateFormat.string(from: Date())): \(identifier) -> \(content)")
+func logEvent(identifier: String, dateFormat: NSDateFormatter, content: String) {
+    print("\(dateFormat.stringFromDate(NSDate())): \(identifier) -> \(content)")
 }
 
-class DebugSink<Source: ObservableType, O: ObserverType> : Sink<O>, ObserverType where O.E == Source.E {
+class Debug_<O: ObserverType> : Sink<O>, ObserverType {
     typealias Element = O.E
-    typealias Parent = Debug<Source>
-    
+    typealias Parent = Debug<Element>
+
     private let _parent: Parent
-    private let _timestampFormatter = DateFormatter()
-    
+    private let _timestampFormatter = NSDateFormatter()
+
     init(parent: Parent, observer: O) {
         _parent = parent
         _timestampFormatter.dateFormat = dateFormat
@@ -29,8 +29,8 @@ class DebugSink<Source: ObservableType, O: ObserverType> : Sink<O>, ObserverType
 
         super.init(observer: observer)
     }
-    
-    func on(_ event: Event<Element>) {
+
+    func on(event: Event<Element>) {
         let maxEventTextLength = 40
         let eventText = "\(event)"
         let eventNormalized = eventText.characters.count > maxEventTextLength
@@ -38,32 +38,28 @@ class DebugSink<Source: ObservableType, O: ObserverType> : Sink<O>, ObserverType
             : eventText
 
         logEvent(_parent._identifier, dateFormat: _timestampFormatter, content: "Event \(eventNormalized)")
-
         forwardOn(event)
-        if event.isStopEvent {
-            dispose()
-        }
     }
-    
+
     override func dispose() {
-        logEvent(_parent._identifier, dateFormat: _timestampFormatter, content: "isDisposed")
+        logEvent(_parent._identifier, dateFormat: _timestampFormatter, content: "disposed")
         super.dispose()
     }
 }
 
-class Debug<Source: ObservableType> : Producer<Source.E> {
-    fileprivate let _identifier: String
-    
-    fileprivate let _source: Source
+class Debug<Element> : Producer<Element> {
+    private let _identifier: String
 
-    init(source: Source, identifier: String?, file: String, line: UInt, function: String) {
+    private let _source: Observable<Element>
+
+    init(source: Observable<Element>, identifier: String?, file: String, line: UInt, function: String) {
         if let identifier = identifier {
             _identifier = identifier
         }
         else {
             let trimmedFile: String
             if let lastIndex = file.lastIndexOf("/") {
-                trimmedFile = file[file.index(after: lastIndex) ..< file.endIndex]
+                trimmedFile = file[lastIndex.successor() ..< file.endIndex]
             }
             else {
                 trimmedFile = file
@@ -72,9 +68,9 @@ class Debug<Source: ObservableType> : Producer<Source.E> {
         }
         _source = source
     }
-    
-    override func run<O: ObserverType>(_ observer: O) -> Disposable where O.E == Source.E {
-        let sink = DebugSink(parent: self, observer: observer)
+
+    override func run<O: ObserverType where O.E == Element>(observer: O) -> Disposable {
+        let sink = Debug_(parent: self, observer: observer)
         sink.disposable = _source.subscribe(sink)
         return sink
     }

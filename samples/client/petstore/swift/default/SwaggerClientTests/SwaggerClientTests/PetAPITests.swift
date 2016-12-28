@@ -25,7 +25,7 @@ class PetAPITests: XCTestCase {
     }
     
     func test1CreatePet() {
-        let expectation = self.expectation(description: "testCreatePet")
+        let expectation = self.expectationWithDescription("testCreatePet")
         
         let newPet = Pet()
         let category = PetstoreClient.Category()
@@ -45,11 +45,11 @@ class PetAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test2GetPet() {
-        let expectation = self.expectation(description: "testGetPet")
+        let expectation = self.expectationWithDescription("testGetPet")
         
         PetAPI.getPetById(petId: 1000) { (pet, error) in
             guard error == nil else {
@@ -65,11 +65,11 @@ class PetAPITests: XCTestCase {
             }
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test3DeletePet() {
-        let expectation = self.expectation(description: "testDeletePet")
+        let expectation = self.expectationWithDescription("testDeletePet")
         
         PetAPI.deletePet(petId: 1000) { (error) in
             guard error == nil else {
@@ -80,7 +80,7 @@ class PetAPITests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }

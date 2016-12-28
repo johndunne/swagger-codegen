@@ -19,7 +19,7 @@ class StoreAPITests: XCTestCase {
     
     func test1PlaceOrder() {
         let order = Order()
-        let shipDate = Date()
+        let shipDate = NSDate()
         order.id = 1000
         order.petId = 1000
         order.complete = false
@@ -27,7 +27,7 @@ class StoreAPITests: XCTestCase {
         order.shipDate = shipDate
         // use explicit naming to reference the enum so that we test we don't regress on enum naming
         order.status = Order.Status.Placed
-        let expectation = self.expectation(description: "testPlaceOrder")
+        let expectation = self.expectationWithDescription("testPlaceOrder")
         StoreAPI.placeOrder(body: order).then { order -> Void in
                 XCTAssert(order.id == 1000, "invalid id")
                 XCTAssert(order.quantity == 10, "invalid quantity")
@@ -38,14 +38,14 @@ class StoreAPITests: XCTestCase {
                 expectation.fulfill()
             }.always {
                 // Noop for now
-            }.catch { errorType in
+            }.error { errorType -> Void in
                 XCTFail("error placing order")
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test2GetOrder() {
-        let expectation = self.expectation(description: "testGetOrder")
+        let expectation = self.expectationWithDescription("testGetOrder")
         StoreAPI.getOrderById(orderId: "1000").then { order -> Void in
             XCTAssert(order.id == 1000, "invalid id")
             XCTAssert(order.quantity == 10, "invalid quantity")
@@ -53,23 +53,23 @@ class StoreAPITests: XCTestCase {
             expectation.fulfill()
             }.always {
                 // Noop for now
-            }.catch { errorType in
+            }.error { errorType -> Void in
                 XCTFail("error placing order")
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
     
     func test3DeleteOrder() {
-        let expectation = self.expectation(description: "testDeleteOrder")
+        let expectation = self.expectationWithDescription("testDeleteOrder")
         StoreAPI.deleteOrder(orderId: "1000").then {
             expectation.fulfill()
         }
-        self.waitForExpectations(timeout: testTimeout, handler: nil)
+        self.waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }
 
-private extension Date {
+private extension NSDate {
 
     /**
      Returns true if the dates are equal given the format string.
@@ -79,10 +79,10 @@ private extension Date {
 
      - returns: true if the dates are equal, given the format string.
      */
-    func isEqual(_ date: Date, format: String) -> Bool {
-        let fmt = DateFormatter()
+    func isEqual(date: NSDate, format: String) -> Bool {
+        let fmt = NSDateFormatter()
         fmt.dateFormat = format
-        return fmt.string(from: self).isEqual(fmt.string(from: date))
+        return fmt.stringFromDate(self).isEqual(fmt.stringFromDate(date))
     }
 
 }

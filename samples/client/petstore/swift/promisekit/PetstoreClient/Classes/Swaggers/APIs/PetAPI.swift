@@ -10,16 +10,16 @@ import PromiseKit
 
 
 
-open class PetAPI: APIBase {
+public class PetAPI: APIBase {
     /**
      Add a new pet to the store
      
      - parameter body: (body) Pet object that needs to be added to the store (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func addPet(body body: Pet? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func addPet(body body: Pet? = nil, completion: ((error: ErrorType?) -> Void)) {
         addPetWithRequestBuilder(body: body).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -29,8 +29,8 @@ open class PetAPI: APIBase {
      - parameter body: (body) Pet object that needs to be added to the store (optional)
      - returns: Promise<Void>
      */
-    open class func addPet(body body: Pet? = nil) -> Promise<Void> {
-        let deferred = Promise<Void>.pending()
+    public class func addPet(body body: Pet? = nil) -> Promise<Void> {
+        let deferred = Promise<Void>.pendingPromise()
         addPet(body: body) { error in
             if let error = error {
                 deferred.reject(error)
@@ -53,7 +53,7 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func addPetWithRequestBuilder(body body: Pet? = nil) -> RequestBuilder<Void> {
+    public class func addPetWithRequestBuilder(body body: Pet? = nil) -> RequestBuilder<Void> {
         let path = "/pet"
         let URLString = PetstoreClientAPI.basePath + path
         let parameters = body?.encodeToJSON() as? [String:AnyObject]
@@ -71,9 +71,9 @@ open class PetAPI: APIBase {
      - parameter petId: (path) Pet id to delete 
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func deletePet(petId petId: Int64, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func deletePet(petId petId: Int64, completion: ((error: ErrorType?) -> Void)) {
         deletePetWithRequestBuilder(petId: petId).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -83,8 +83,8 @@ open class PetAPI: APIBase {
      - parameter petId: (path) Pet id to delete 
      - returns: Promise<Void>
      */
-    open class func deletePet(petId petId: Int64) -> Promise<Void> {
-        let deferred = Promise<Void>.pending()
+    public class func deletePet(petId petId: Int64) -> Promise<Void> {
+        let deferred = Promise<Void>.pendingPromise()
         deletePet(petId: petId) { error in
             if let error = error {
                 deferred.reject(error)
@@ -107,12 +107,12 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func deletePetWithRequestBuilder(petId petId: Int64) -> RequestBuilder<Void> {
+    public class func deletePetWithRequestBuilder(petId petId: Int64) -> RequestBuilder<Void> {
         var path = "/pet/{petId}"
-        path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{petId}", withString: "\(petId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [:]
+        let nillableParameters: [String:AnyObject?] = [:]
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -129,9 +129,9 @@ open class PetAPI: APIBase {
      - parameter status: (query) Status values that need to be considered for filter (optional, default to available)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func findPetsByStatus(status status: [String]? = nil, completion: @escaping ((_ data: [Pet]?,_ error: Error?) -> Void)) {
+    public class func findPetsByStatus(status status: [String]? = nil, completion: ((data: [Pet]?, error: ErrorType?) -> Void)) {
         findPetsByStatusWithRequestBuilder(status: status).execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -141,8 +141,8 @@ open class PetAPI: APIBase {
      - parameter status: (query) Status values that need to be considered for filter (optional, default to available)
      - returns: Promise<[Pet]>
      */
-    open class func findPetsByStatus(status status: [String]? = nil) -> Promise<[Pet]> {
-        let deferred = Promise<[Pet]>.pending()
+    public class func findPetsByStatus(status status: [String]? = nil) -> Promise<[Pet]> {
+        let deferred = Promise<[Pet]>.pendingPromise()
         findPetsByStatus(status: status) { data, error in
             if let error = error {
                 deferred.reject(error)
@@ -172,11 +172,11 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<[Pet]> 
      */
-    open class func findPetsByStatusWithRequestBuilder(status status: [String]? = nil) -> RequestBuilder<[Pet]> {
+    public class func findPetsByStatusWithRequestBuilder(status status: [String]? = nil) -> RequestBuilder<[Pet]> {
         let path = "/pet/findByStatus"
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [
+        let nillableParameters: [String:AnyObject?] = [
             "status": status
         ]
  
@@ -195,9 +195,9 @@ open class PetAPI: APIBase {
      - parameter tags: (query) Tags to filter by (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func findPetsByTags(tags tags: [String]? = nil, completion: @escaping ((_ data: [Pet]?,_ error: Error?) -> Void)) {
+    public class func findPetsByTags(tags tags: [String]? = nil, completion: ((data: [Pet]?, error: ErrorType?) -> Void)) {
         findPetsByTagsWithRequestBuilder(tags: tags).execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -207,8 +207,8 @@ open class PetAPI: APIBase {
      - parameter tags: (query) Tags to filter by (optional)
      - returns: Promise<[Pet]>
      */
-    open class func findPetsByTags(tags tags: [String]? = nil) -> Promise<[Pet]> {
-        let deferred = Promise<[Pet]>.pending()
+    public class func findPetsByTags(tags tags: [String]? = nil) -> Promise<[Pet]> {
+        let deferred = Promise<[Pet]>.pendingPromise()
         findPetsByTags(tags: tags) { data, error in
             if let error = error {
                 deferred.reject(error)
@@ -277,11 +277,11 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<[Pet]> 
      */
-    open class func findPetsByTagsWithRequestBuilder(tags tags: [String]? = nil) -> RequestBuilder<[Pet]> {
+    public class func findPetsByTagsWithRequestBuilder(tags tags: [String]? = nil) -> RequestBuilder<[Pet]> {
         let path = "/pet/findByTags"
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [
+        let nillableParameters: [String:AnyObject?] = [
             "tags": tags
         ]
  
@@ -300,9 +300,9 @@ open class PetAPI: APIBase {
      - parameter petId: (path) ID of pet that needs to be fetched 
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func getPetById(petId petId: Int64, completion: @escaping ((_ data: Pet?,_ error: Error?) -> Void)) {
+    public class func getPetById(petId petId: Int64, completion: ((data: Pet?, error: ErrorType?) -> Void)) {
         getPetByIdWithRequestBuilder(petId: petId).execute { (response, error) -> Void in
-            completion(response?.body, error);
+            completion(data: response?.body, error: error);
         }
     }
 
@@ -312,8 +312,8 @@ open class PetAPI: APIBase {
      - parameter petId: (path) ID of pet that needs to be fetched 
      - returns: Promise<Pet>
      */
-    open class func getPetById(petId petId: Int64) -> Promise<Pet> {
-        let deferred = Promise<Pet>.pending()
+    public class func getPetById(petId petId: Int64) -> Promise<Pet> {
+        let deferred = Promise<Pet>.pendingPromise()
         getPetById(petId: petId) { data, error in
             if let error = error {
                 deferred.reject(error)
@@ -385,12 +385,12 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Pet> 
      */
-    open class func getPetByIdWithRequestBuilder(petId petId: Int64) -> RequestBuilder<Pet> {
+    public class func getPetByIdWithRequestBuilder(petId petId: Int64) -> RequestBuilder<Pet> {
         var path = "/pet/{petId}"
-        path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{petId}", withString: "\(petId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [:]
+        let nillableParameters: [String:AnyObject?] = [:]
  
         let parameters = APIHelper.rejectNil(nillableParameters)
  
@@ -407,9 +407,9 @@ open class PetAPI: APIBase {
      - parameter body: (body) Pet object that needs to be added to the store (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func updatePet(body body: Pet? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func updatePet(body body: Pet? = nil, completion: ((error: ErrorType?) -> Void)) {
         updatePetWithRequestBuilder(body: body).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -419,8 +419,8 @@ open class PetAPI: APIBase {
      - parameter body: (body) Pet object that needs to be added to the store (optional)
      - returns: Promise<Void>
      */
-    open class func updatePet(body body: Pet? = nil) -> Promise<Void> {
-        let deferred = Promise<Void>.pending()
+    public class func updatePet(body body: Pet? = nil) -> Promise<Void> {
+        let deferred = Promise<Void>.pendingPromise()
         updatePet(body: body) { error in
             if let error = error {
                 deferred.reject(error)
@@ -443,7 +443,7 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func updatePetWithRequestBuilder(body body: Pet? = nil) -> RequestBuilder<Void> {
+    public class func updatePetWithRequestBuilder(body body: Pet? = nil) -> RequestBuilder<Void> {
         let path = "/pet"
         let URLString = PetstoreClientAPI.basePath + path
         let parameters = body?.encodeToJSON() as? [String:AnyObject]
@@ -463,9 +463,9 @@ open class PetAPI: APIBase {
      - parameter status: (form) Updated status of the pet (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func updatePetWithForm(petId petId: String, name: String? = nil, status: String? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func updatePetWithForm(petId petId: String, name: String? = nil, status: String? = nil, completion: ((error: ErrorType?) -> Void)) {
         updatePetWithFormWithRequestBuilder(petId: petId, name: name, status: status).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -477,8 +477,8 @@ open class PetAPI: APIBase {
      - parameter status: (form) Updated status of the pet (optional)
      - returns: Promise<Void>
      */
-    open class func updatePetWithForm(petId petId: String, name: String? = nil, status: String? = nil) -> Promise<Void> {
-        let deferred = Promise<Void>.pending()
+    public class func updatePetWithForm(petId petId: String, name: String? = nil, status: String? = nil) -> Promise<Void> {
+        let deferred = Promise<Void>.pendingPromise()
         updatePetWithForm(petId: petId, name: name, status: status) { error in
             if let error = error {
                 deferred.reject(error)
@@ -503,12 +503,12 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func updatePetWithFormWithRequestBuilder(petId petId: String, name: String? = nil, status: String? = nil) -> RequestBuilder<Void> {
+    public class func updatePetWithFormWithRequestBuilder(petId petId: String, name: String? = nil, status: String? = nil) -> RequestBuilder<Void> {
         var path = "/pet/{petId}"
-        path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{petId}", withString: "\(petId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [
+        let nillableParameters: [String:AnyObject?] = [
             "name": name,
             "status": status
         ]
@@ -530,9 +530,9 @@ open class PetAPI: APIBase {
      - parameter file: (form) file to upload (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func uploadFile(petId petId: Int64, additionalMetadata: String? = nil, file: URL? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
+    public class func uploadFile(petId petId: Int64, additionalMetadata: String? = nil, file: NSURL? = nil, completion: ((error: ErrorType?) -> Void)) {
         uploadFileWithRequestBuilder(petId: petId, additionalMetadata: additionalMetadata, file: file).execute { (response, error) -> Void in
-            completion(error);
+            completion(error: error);
         }
     }
 
@@ -544,8 +544,8 @@ open class PetAPI: APIBase {
      - parameter file: (form) file to upload (optional)
      - returns: Promise<Void>
      */
-    open class func uploadFile(petId petId: Int64, additionalMetadata: String? = nil, file: URL? = nil) -> Promise<Void> {
-        let deferred = Promise<Void>.pending()
+    public class func uploadFile(petId petId: Int64, additionalMetadata: String? = nil, file: NSURL? = nil) -> Promise<Void> {
+        let deferred = Promise<Void>.pendingPromise()
         uploadFile(petId: petId, additionalMetadata: additionalMetadata, file: file) { error in
             if let error = error {
                 deferred.reject(error)
@@ -570,12 +570,12 @@ open class PetAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func uploadFileWithRequestBuilder(petId petId: Int64, additionalMetadata: String? = nil, file: URL? = nil) -> RequestBuilder<Void> {
+    public class func uploadFileWithRequestBuilder(petId petId: Int64, additionalMetadata: String? = nil, file: NSURL? = nil) -> RequestBuilder<Void> {
         var path = "/pet/{petId}/uploadImage"
-        path = path.replacingOccurrences(of: "{petId}", with: "\(petId)", options: .literal, range: nil)
+        path = path.stringByReplacingOccurrencesOfString("{petId}", withString: "\(petId)", options: .LiteralSearch, range: nil)
         let URLString = PetstoreClientAPI.basePath + path
 
-        let nillableParameters: [String:Any?] = [
+        let nillableParameters: [String:AnyObject?] = [
             "additionalMetadata": additionalMetadata,
             "file": file
         ]
