@@ -9,34 +9,34 @@
 import Foundation
 
 
-class ConcatSink<S: Sequence, O: ObserverType>
+class ConcatSink<S: SequenceType, O: ObserverType where S.Generator.Element : ObservableConvertibleType, S.Generator.Element.E == O.E>
     : TailRecursiveSink<S, O>
-    , ObserverType where S.Iterator.Element : ObservableConvertibleType, S.Iterator.Element.E == O.E {
+    , ObserverType {
     typealias Element = O.E
-    
+
     override init(observer: O) {
         super.init(observer: observer)
     }
-    
-    func on(_ event: Event<Element>){
+
+    func on(event: Event<Element>){
         switch event {
-        case .next:
+        case .Next:
             forwardOn(event)
-        case .error:
+        case .Error:
             forwardOn(event)
             dispose()
-        case .completed:
-            schedule(.moveNext)
+        case .Completed:
+            schedule(.MoveNext)
         }
     }
 
-    override func subscribeToNext(_ source: Observable<E>) -> Disposable {
+    override func subscribeToNext(source: Observable<E>) -> Disposable {
         return source.subscribe(self)
     }
-    
-    override func extract(_ observable: Observable<E>) -> SequenceGenerator? {
+
+    override func extract(observable: Observable<E>) -> SequenceGenerator? {
         if let source = observable as? Concat<S> {
-            return (source._sources.makeIterator(), source._count)
+            return (source._sources.generate(), source._count)
         }
         else {
             return nil
@@ -44,20 +44,20 @@ class ConcatSink<S: Sequence, O: ObserverType>
     }
 }
 
-class Concat<S: Sequence> : Producer<S.Iterator.Element.E> where S.Iterator.Element : ObservableConvertibleType {
-    typealias Element = S.Iterator.Element.E
-    
-    fileprivate let _sources: S
-    fileprivate let _count: IntMax?
+class Concat<S: SequenceType where S.Generator.Element : ObservableConvertibleType> : Producer<S.Generator.Element.E> {
+    typealias Element = S.Generator.Element.E
+
+    private let _sources: S
+    private let _count: IntMax?
 
     init(sources: S, count: IntMax?) {
         _sources = sources
         _count = count
     }
-    
-    override func run<O: ObserverType>(_ observer: O) -> Disposable where O.E == Element {
+
+    override func run<O: ObserverType where O.E == Element>(observer: O) -> Disposable {
         let sink = ConcatSink<S, O>(observer: observer)
-        sink.disposable = sink.run((_sources.makeIterator(), _count))
+        sink.disposable = sink.run((_sources.generate(), _count))
         return sink
     }
 }

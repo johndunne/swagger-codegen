@@ -84,22 +84,20 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
                     "Void",
                     "String",
                     "Character",
-                    "AnyObject",
-                    "Any")
+                    "AnyObject")
                 );
         defaultIncludes = new HashSet<String>(
                 Arrays.asList(
-                    "Data",
-                    "Date",
-                    "URL", // for file
+                    "NSData",
+                    "NSDate",
+                    "NSURL", // for file
                     "NSUUID",
                     "Array",
                     "Dictionary",
                     "Set",
                     "Any",
                     "Empty",
-                    "AnyObject",
-                    "Any")
+                    "AnyObject")
                 );
         reservedWords = new HashSet<String>(
                 Arrays.asList(
@@ -121,9 +119,9 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
         typeMapping.put("array", "Array");
         typeMapping.put("List", "Array");
         typeMapping.put("map", "Dictionary");
-        typeMapping.put("date", "Date");
-        typeMapping.put("Date", "Date");
-        typeMapping.put("DateTime", "Date");
+        typeMapping.put("date", "NSDate");
+        typeMapping.put("Date", "NSDate");
+        typeMapping.put("DateTime", "NSDate");
         typeMapping.put("boolean", "Bool");
         typeMapping.put("string", "String");
         typeMapping.put("char", "Character");
@@ -135,10 +133,10 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
         typeMapping.put("float", "Float");
         typeMapping.put("number", "Double");
         typeMapping.put("double", "Double");
-        typeMapping.put("object", "Any");
-        typeMapping.put("file", "URL");
-        typeMapping.put("binary", "Data");
-        typeMapping.put("ByteArray", "Data");
+        typeMapping.put("object", "AnyObject");
+        typeMapping.put("file", "NSURL");
+        typeMapping.put("binary", "NSData");
+        typeMapping.put("ByteArray", "NSData");
         typeMapping.put("UUID", "NSUUID");
 
         importMapping = new HashMap<String, String>();
@@ -279,7 +277,7 @@ public class SwiftCodegen extends DefaultCodegen implements CodegenConfig {
 
     @Override
     public boolean isDataTypeBinary(final String dataType) {
-      return dataType != null && dataType.equals("Data");
+      return dataType != null && dataType.equals("NSData");
     }
 
     /**

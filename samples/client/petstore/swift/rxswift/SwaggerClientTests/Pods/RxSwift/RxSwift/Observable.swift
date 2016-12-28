@@ -9,7 +9,7 @@
 import Foundation
 
 /**
-A type-erased `ObservableType`. 
+A type-erased `ObservableType`.
 
 It represents a push style sequence.
 */
@@ -18,24 +18,24 @@ public class Observable<Element> : ObservableType {
     Type of elements in sequence.
     */
     public typealias E = Element
-    
+
     init() {
 #if TRACE_RESOURCES
         OSAtomicIncrement32(&resourceCount)
 #endif
     }
-    
-    public func subscribe<O: ObserverType>(_ observer: O) -> Disposable where O.E == E {
+
+    public func subscribe<O: ObserverType where O.E == E>(observer: O) -> Disposable {
         abstractMethod()
     }
-    
+
     public func asObservable() -> Observable<E> {
         return self
     }
-    
+
     deinit {
 #if TRACE_RESOURCES
-        let _ = AtomicDecrement(&resourceCount)
+        AtomicDecrement(&resourceCount)
 #endif
     }
 
@@ -45,8 +45,7 @@ public class Observable<Element> : ObservableType {
     /**
     Optimizations for map operator
     */
-    internal func composeMap<R>(_ selector: @escaping (Element) throws -> R) -> Observable<R> {
+    internal func composeMap<R>(selector: Element throws -> R) -> Observable<R> {
         return Map(source: self, selector: selector)
     }
 }
-

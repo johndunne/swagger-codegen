@@ -62,8 +62,8 @@ public class SwiftCodegenTest {
         final Operation p = model.getPaths().get(path).getPost();
         final CodegenOperation op = codegen.fromOperation(path, "post", p, model.getDefinitions());
 
-        Assert.assertEquals(op.returnType, "Data");
-        Assert.assertEquals(op.bodyParam.dataType, "Data");
+        Assert.assertEquals(op.returnType, "NSData");
+        Assert.assertEquals(op.bodyParam.dataType, "NSData");
         Assert.assertTrue(op.bodyParam.isBinary);
         Assert.assertTrue(op.responses.get(0).isBinary);
     }

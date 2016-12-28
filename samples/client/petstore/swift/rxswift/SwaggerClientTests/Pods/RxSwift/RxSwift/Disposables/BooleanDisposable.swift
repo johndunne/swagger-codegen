@@ -11,35 +11,35 @@ import Foundation
 /**
 Represents a disposable resource that can be checked for disposal status.
 */
-public final class BooleanDisposable : Disposable, Cancelable {
- 
-    internal static let BooleanDisposableTrue = BooleanDisposable(isDisposed: true)
-    private var _isDisposed = false
-    
+public class BooleanDisposable : Disposable, Cancelable {
+
+    internal static let BooleanDisposableTrue = BooleanDisposable(disposed: true)
+    private var _disposed = false
+
     /**
         Initializes a new instance of the `BooleanDisposable` class
      */
     public init() {
     }
-    
+
     /**
         Initializes a new instance of the `BooleanDisposable` class with given value
      */
-    public init(isDisposed: Bool) {
-        self._isDisposed = isDisposed
+    public init(disposed: Bool) {
+        self._disposed = disposed
     }
-    
+
     /**
         - returns: Was resource disposed.
      */
-    public var isDisposed: Bool {
-        return _isDisposed
+    public var disposed: Bool {
+        return _disposed
     }
-    
+
     /**
-        Sets the status to disposed, which can be observer through the `isDisposed` property.
+        Sets the status to disposed, which can be observer through the `disposed` property.
      */
     public func dispose() {
-        _isDisposed = true
+        _disposed = true
     }
 }

@@ -6,48 +6,41 @@
 
 import Foundation
 
-<<<<<<< HEAD
-open class PetstoreClientAPI {
-    open static var basePath = "http://petstore.swagger.io/v2"
-    open static var credential: URLCredential?
-    open static var customHeaders: [String:String] = [:]
-=======
 public class PetstoreClientAPI {
     public static var basePath = "http://petstore.swagger.io/v2"
     public static var credential: NSURLCredential?
     public static var customHeaders: [String:String] = [:]  
->>>>>>> upstream/master
     static var requestBuilderFactory: RequestBuilderFactory = AlamofireRequestBuilderFactory()
 }
 
-open class APIBase {
-    func toParameters(_ encodable: JSONEncodable?) -> [String: Any]? {
-        let encoded: Any? = encodable?.encodeToJSON()
+public class APIBase {
+    func toParameters(encodable: JSONEncodable?) -> [String: AnyObject]? {
+        let encoded: AnyObject? = encodable?.encodeToJSON()
 
-        if encoded! is [Any] {
-            var dictionary = [String:Any]()
-            for (index, item) in (encoded as! [Any]).enumerated() {
+        if encoded! is [AnyObject] {
+            var dictionary = [String:AnyObject]()
+            for (index, item) in (encoded as! [AnyObject]).enumerate() {
                 dictionary["\(index)"] = item
             }
             return dictionary
         } else {
-            return encoded as? [String:Any]
+            return encoded as? [String:AnyObject]
         }
     }
 }
 
-open class RequestBuilder<T> {
-    var credential: URLCredential?
+public class RequestBuilder<T> {
+    var credential: NSURLCredential?
     var headers: [String:String] = [:]
-    let parameters: [String:Any]?
+    let parameters: [String:AnyObject]?
     let isBody: Bool
     let method: String
     let URLString: String
     
     /// Optional block to obtain a reference to the request's progress instance when available.
-    public var onProgressReady: ((Progress) -> ())?
+    public var onProgressReady: ((NSProgress) -> ())?
 
-    required public init(method: String, URLString: String, parameters: [String:Any]?, isBody: Bool) {
+    required public init(method: String, URLString: String, parameters: [String:AnyObject]?, isBody: Bool) {
         self.method = method
         self.URLString = URLString
         self.parameters = parameters
@@ -56,36 +49,22 @@ open class RequestBuilder<T> {
         addHeaders(PetstoreClientAPI.customHeaders)
     }
     
-<<<<<<< HEAD
-    open func addHeaders(_ aHeaders:[String:String]) {
-=======
     public func addHeaders(aHeaders:[String:String]) {
->>>>>>> upstream/master
         for (header, value) in aHeaders {
             headers[header] = value
         }
     }
     
-<<<<<<< HEAD
-    open func execute(_ completion: @escaping (_ response: Response<T>?, _ error: Error?) -> Void) { }
-
-    public func addHeader(name: String, value: String) -> Self {
-=======
     public func execute(completion: (response: Response<T>?, error: ErrorType?) -> Void) { }
 
     public func addHeader(name name: String, value: String) -> Self {
->>>>>>> upstream/master
         if !value.isEmpty {
             headers[name] = value
         }
         return self
     }
     
-<<<<<<< HEAD
-    open func addCredential() -> Self {
-=======
     public func addCredential() -> Self {
->>>>>>> upstream/master
         self.credential = PetstoreClientAPI.credential
         return self
     }

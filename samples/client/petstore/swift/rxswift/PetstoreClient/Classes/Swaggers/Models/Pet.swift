@@ -25,15 +25,15 @@ public class Pet: JSONEncodable {
     public init() {}
 
     // MARK: JSONEncodable
-    func encodeToJSON() -> Any {
-        var nillableDictionary = [String:Any?]()
+    func encodeToJSON() -> AnyObject {
+        var nillableDictionary = [String:AnyObject?]()
         nillableDictionary["id"] = self.id?.encodeToJSON()
         nillableDictionary["category"] = self.category?.encodeToJSON()
         nillableDictionary["name"] = self.name
         nillableDictionary["photoUrls"] = self.photoUrls?.encodeToJSON()
         nillableDictionary["tags"] = self.tags?.encodeToJSON()
         nillableDictionary["status"] = self.status?.rawValue
-        let dictionary: [String:Any] = APIHelper.rejectNil(nillableDictionary) ?? [:]
+        let dictionary: [String:AnyObject] = APIHelper.rejectNil(nillableDictionary) ?? [:]
         return dictionary
     }
 }

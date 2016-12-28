@@ -8,37 +8,37 @@
 
 import Foundation
 
-class DeferredSink<S: ObservableType, O: ObserverType> : Sink<O>, ObserverType where S.E == O.E {
+class DeferredSink<S: ObservableType, O: ObserverType where S.E == O.E> : Sink<O>, ObserverType {
     typealias E = O.E
 
     private let _observableFactory: () throws -> S
 
-    init(observableFactory: @escaping () throws -> S, observer: O) {
+    init(observableFactory: () throws -> S, observer: O) {
         _observableFactory = observableFactory
         super.init(observer: observer)
     }
-    
+
     func run() -> Disposable {
         do {
             let result = try _observableFactory()
             return result.subscribe(self)
         }
         catch let e {
-            forwardOn(.error(e))
+            forwardOn(.Error(e))
             dispose()
-            return Disposables.create()
+            return NopDisposable.instance
         }
     }
-    
-    func on(_ event: Event<E>) {
+
+    func on(event: Event<E>) {
         forwardOn(event)
-        
+
         switch event {
-        case .next:
+        case .Next:
             break
-        case .error:
+        case .Error:
             dispose()
-        case .completed:
+        case .Completed:
             dispose()
         }
     }
@@ -46,14 +46,14 @@ class DeferredSink<S: ObservableType, O: ObserverType> : Sink<O>, ObserverType w
 
 class Deferred<S: ObservableType> : Producer<S.E> {
     typealias Factory = () throws -> S
-    
+
     private let _observableFactory : Factory
-    
-    init(observableFactory: @escaping Factory) {
+
+    init(observableFactory: Factory) {
         _observableFactory = observableFactory
     }
-    
-    override func run<O: ObserverType>(_ observer: O) -> Disposable where O.E == S.E {
+
+    override func run<O: ObserverType where O.E == S.E>(observer: O) -> Disposable {
         let sink = DeferredSink(observableFactory: _observableFactory, observer: observer)
         sink.disposable = sink.run()
         return sink

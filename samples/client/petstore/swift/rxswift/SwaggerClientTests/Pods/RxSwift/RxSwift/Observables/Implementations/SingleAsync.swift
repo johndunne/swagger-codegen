@@ -8,21 +8,21 @@
 
 import Foundation
 
-class SingleAsyncSink<ElementType, O: ObserverType> : Sink<O>, ObserverType where O.E == ElementType {
+class SingleAsyncSink<ElementType, O: ObserverType where O.E == ElementType> : Sink<O>, ObserverType {
     typealias Parent = SingleAsync<ElementType>
     typealias E = ElementType
-    
+
     private let _parent: Parent
     private var _seenValue: Bool = false
-    
+
     init(parent: Parent, observer: O) {
         _parent = parent
         super.init(observer: observer)
     }
-    
-    func on(_ event: Event<E>) {
+
+    func on(event: Event<E>) {
         switch event {
-        case .next(let value):
+        case .Next(let value):
             do {
                 let forward = try _parent._predicate?(value) ?? true
                 if !forward {
@@ -30,27 +30,27 @@ class SingleAsyncSink<ElementType, O: ObserverType> : Sink<O>, ObserverType wher
                 }
             }
             catch let error {
-                forwardOn(.error(error as Swift.Error))
+                forwardOn(.Error(error as ErrorType))
                 dispose()
                 return
             }
 
             if _seenValue == false {
                 _seenValue = true
-                forwardOn(.next(value))
+                forwardOn(.Next(value))
             } else {
-                forwardOn(.error(RxError.moreThanOneElement))
+                forwardOn(.Error(RxError.MoreThanOneElement))
                 dispose()
             }
-            
-        case .error:
+
+        case .Error:
             forwardOn(event)
             dispose()
-        case .completed:
+        case .Completed:
             if (!_seenValue) {
-                forwardOn(.error(RxError.noElements))
+                forwardOn(.Error(RxError.NoElements))
             } else {
-                forwardOn(.completed)
+                forwardOn(.Completed)
             }
             dispose()
         }
@@ -59,16 +59,16 @@ class SingleAsyncSink<ElementType, O: ObserverType> : Sink<O>, ObserverType wher
 
 class SingleAsync<Element>: Producer<Element> {
     typealias Predicate = (Element) throws -> Bool
-    
-    fileprivate let _source: Observable<Element>
-    fileprivate let _predicate: Predicate?
-    
+
+    private let _source: Observable<Element>
+    private let _predicate: Predicate?
+
     init(source: Observable<Element>, predicate: Predicate? = nil) {
         _source = source
         _predicate = predicate
     }
-    
-    override func run<O : ObserverType>(_ observer: O) -> Disposable where O.E == Element {
+
+    override func run<O : ObserverType where O.E == Element>(observer: O) -> Disposable {
         let sink = SingleAsyncSink(parent: self, observer: observer)
         sink.disposable = _source.subscribe(sink)
         return sink

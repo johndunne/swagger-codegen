@@ -17,7 +17,6 @@ public class CodegenOperation {
             isResponseBinary = Boolean.FALSE, hasReference = Boolean.FALSE,
             isRestfulIndex, isRestfulShow, isRestfulCreate, isRestfulUpdate, isRestfulDestroy,
             isRestful;
-    public Boolean createOperation, requestOperation, updateOperation, destroyOperation, createOrUpdateOperation;
     public String path, operationId, returnType, httpMethod, returnBaseType,
             returnContainer, summary, unescapedNotes, notes, baseName, defaultResponse, discriminator;
     public List<Map<String, String>> consumes, produces, prioritizedContentTypes;

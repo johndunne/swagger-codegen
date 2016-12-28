@@ -11,28 +11,30 @@ import Foundation
 class FilterSink<O : ObserverType>: Sink<O>, ObserverType {
     typealias Predicate = (Element) throws -> Bool
     typealias Element = O.E
-    
+
+    typealias Parent = Filter<Element>
+
     private let _predicate: Predicate
-    
-    init(predicate: @escaping Predicate, observer: O) {
+
+    init(predicate: Predicate, observer: O) {
         _predicate = predicate
         super.init(observer: observer)
     }
-    
-    func on(_ event: Event<Element>) {
+
+    func on(event: Event<Element>) {
         switch event {
-            case .next(let value):
+            case .Next(let value):
                 do {
                     let satisfies = try _predicate(value)
                     if satisfies {
-                        forwardOn(.next(value))
+                        forwardOn(.Next(value))
                     }
                 }
                 catch let e {
-                    forwardOn(.error(e))
+                    forwardOn(.Error(e))
                     dispose()
                 }
-            case .completed, .error:
+            case .Completed, .Error:
                 forwardOn(event)
                 dispose()
         }
@@ -41,16 +43,16 @@ class FilterSink<O : ObserverType>: Sink<O>, ObserverType {
 
 class Filter<Element> : Producer<Element> {
     typealias Predicate = (Element) throws -> Bool
-    
+
     private let _source: Observable<Element>
     private let _predicate: Predicate
-    
-    init(source: Observable<Element>, predicate: @escaping Predicate) {
+
+    init(source: Observable<Element>, predicate: Predicate) {
         _source = source
         _predicate = predicate
     }
-    
-    override func run<O: ObserverType>(_ observer: O) -> Disposable where O.E == Element {
+
+    override func run<O: ObserverType where O.E == Element>(observer: O) -> Disposable {
         let sink = FilterSink(predicate: _predicate, observer: observer)
         sink.disposable = _source.subscribe(sink)
         return sink

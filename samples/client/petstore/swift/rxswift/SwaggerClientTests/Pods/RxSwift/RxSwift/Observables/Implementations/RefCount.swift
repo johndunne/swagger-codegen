@@ -8,22 +8,22 @@
 
 import Foundation
 
-class RefCountSink<CO: ConnectableObservableType, O: ObserverType>
+class RefCountSink<CO: ConnectableObservableType, O: ObserverType where CO.E == O.E>
     : Sink<O>
-    , ObserverType where CO.E == O.E {
+    , ObserverType {
     typealias Element = O.E
     typealias Parent = RefCount<CO>
-    
+
     private let _parent: Parent
 
     init(parent: Parent, observer: O) {
         _parent = parent
         super.init(observer: observer)
     }
-    
+
     func run() -> Disposable {
         let subscription = _parent._source.subscribeSafe(self)
-        
+
         _parent._lock.lock(); defer { _parent._lock.unlock() } // {
             if _parent._count == 0 {
                 _parent._count = 1
@@ -33,8 +33,8 @@ class RefCountSink<CO: ConnectableObservableType, O: ObserverType>
                 _parent._count = _parent._count + 1
             }
         // }
-        
-        return Disposables.create {
+
+        return AnonymousDisposable {
             subscription.dispose()
             self._parent._lock.lock(); defer { self._parent._lock.unlock() } // {
                 if self._parent._count == 1 {
@@ -52,11 +52,11 @@ class RefCountSink<CO: ConnectableObservableType, O: ObserverType>
         }
     }
 
-    func on(_ event: Event<Element>) {
+    func on(event: Event<Element>) {
         switch event {
-        case .next:
+        case .Next:
             forwardOn(event)
-        case .error, .completed:
+        case .Error, .Completed:
             forwardOn(event)
             dispose()
         }
@@ -64,19 +64,19 @@ class RefCountSink<CO: ConnectableObservableType, O: ObserverType>
 }
 
 class RefCount<CO: ConnectableObservableType>: Producer<CO.E> {
-    fileprivate let _lock = NSRecursiveLock()
-    
+    private let _lock = NSRecursiveLock()
+
     // state
-    fileprivate var _count = 0
-    fileprivate var _connectableSubscription = nil as Disposable?
-    
-    fileprivate let _source: CO
-    
+    private var _count = 0
+    private var _connectableSubscription = nil as Disposable?
+
+    private let _source: CO
+
     init(source: CO) {
         _source = source
     }
-    
-    override func run<O: ObserverType>(_ observer: O) -> Disposable where O.E == CO.E {
+
+    override func run<O: ObserverType where O.E == CO.E>(observer: O) -> Disposable {
         let sink = RefCountSink(parent: self, observer: observer)
         sink.disposable = sink.run()
         return sink

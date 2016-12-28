@@ -210,7 +210,6 @@ open class AlamofireRequestBuilder<T>: RequestBuilder<T> {
                 completion(nil, ErrorResponse.Error(500, nil, NSError(domain: "localhost", code: 500, userInfo: ["reason": "unreacheable code"])))
             }
         }
-        debugPrint(validatedRequest)
     }
 
     private func buildHeaders() -> [String: String] {

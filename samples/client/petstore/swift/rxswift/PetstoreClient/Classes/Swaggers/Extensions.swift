@@ -7,79 +7,79 @@
 import Alamofire
 
 extension Bool: JSONEncodable {
-    func encodeToJSON() -> Any { return self as Any }
+    func encodeToJSON() -> AnyObject { return self }
 }
 
 extension Float: JSONEncodable {
-    func encodeToJSON() -> Any { return self as Any }
+    func encodeToJSON() -> AnyObject { return self }
 }
 
 extension Int: JSONEncodable {
-    func encodeToJSON() -> Any { return self as Any }
+    func encodeToJSON() -> AnyObject { return self }
 }
 
 extension Int32: JSONEncodable {
-    func encodeToJSON() -> Any { return NSNumber(value: self as Int32) }
+    func encodeToJSON() -> AnyObject { return NSNumber(int: self) }
 }
 
 extension Int64: JSONEncodable {
-    func encodeToJSON() -> Any { return NSNumber(value: self as Int64) }
+    func encodeToJSON() -> AnyObject { return NSNumber(longLong: self) }
 }
 
 extension Double: JSONEncodable {
-    func encodeToJSON() -> Any { return self as Any }
+    func encodeToJSON() -> AnyObject { return self }
 }
 
 extension String: JSONEncodable {
-    func encodeToJSON() -> Any { return self as Any }
+    func encodeToJSON() -> AnyObject { return self }
 }
 
-private func encodeIfPossible<T>(_ object: T) -> Any {
+private func encodeIfPossible<T>(object: T) -> AnyObject {
     if object is JSONEncodable {
         return (object as! JSONEncodable).encodeToJSON()
     } else {
-        return object as Any
+        return object as! AnyObject
     }
 }
 
 extension Array: JSONEncodable {
-    func encodeToJSON() -> Any {
+    func encodeToJSON() -> AnyObject {
         return self.map(encodeIfPossible)
     }
 }
 
 extension Dictionary: JSONEncodable {
-    func encodeToJSON() -> Any {
-        var dictionary = [AnyHashable: Any]()
+    func encodeToJSON() -> AnyObject {
+        var dictionary = [NSObject:AnyObject]()
         for (key, value) in self {
             dictionary[key as! NSObject] = encodeIfPossible(value)
         }
-        return dictionary as Any
+        return dictionary
     }
 }
 
-extension Data: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return self.base64EncodedString(options: Data.Base64EncodingOptions())
+extension NSData: JSONEncodable {
+    func encodeToJSON() -> AnyObject {
+        return self.base64EncodedStringWithOptions(NSDataBase64EncodingOptions())
     }
 }
 
-private let dateFormatter: DateFormatter = {
-    let fmt = DateFormatter()
+private let dateFormatter: NSDateFormatter = {
+    let fmt = NSDateFormatter()
     fmt.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-    fmt.locale = Locale(identifier: "en_US_POSIX")
+    fmt.locale = NSLocale(localeIdentifier: "en_US_POSIX")
     return fmt
 }()
 
-extension Date: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return dateFormatter.string(from: self) as Any
+extension NSDate: JSONEncodable {
+    func encodeToJSON() -> AnyObject {
+        return dateFormatter.stringFromDate(self)
     }
 }
 
 extension NSUUID: JSONEncodable {
-    func encodeToJSON() -> Any {
-        return self.uuidString
+    func encodeToJSON() -> AnyObject {
+        return self.UUIDString
     }
 }
 

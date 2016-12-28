@@ -8,18 +8,18 @@
 
 import Foundation
 
-private let disposeScheduledDisposable: (ScheduledDisposable) -> Disposable = { sd in
+private let disposeScheduledDisposable: ScheduledDisposable -> Disposable = { sd in
     sd.disposeInner()
-    return Disposables.create()
+    return NopDisposable.instance
 }
 
 /**
 Represents a disposable resource whose disposal invocation will be scheduled on the specified scheduler.
 */
-public final class ScheduledDisposable : Cancelable {
+public class ScheduledDisposable : Cancelable {
     public let scheduler: ImmediateSchedulerType
 
-    private var _isDisposed: AtomicInt = 0
+    private var _disposed: AtomicInt = 0
 
     // state
     private var _disposable: Disposable?
@@ -27,8 +27,8 @@ public final class ScheduledDisposable : Cancelable {
     /**
     - returns: Was resource disposed.
     */
-    public var isDisposed: Bool {
-        return _isDisposed == 1
+    public var disposed: Bool {
+        return _disposed == 1
     }
 
     /**
@@ -46,11 +46,11 @@ public final class ScheduledDisposable : Cancelable {
     Disposes the wrapped disposable on the provided scheduler.
     */
     public func dispose() {
-        let _ = scheduler.schedule(self, action: disposeScheduledDisposable)
+        scheduler.schedule(self, action: disposeScheduledDisposable)
     }
 
     func disposeInner() {
-        if AtomicCompareAndSwap(0, 1, &_isDisposed) {
+        if AtomicCompareAndSwap(0, 1, &_disposed) {
             _disposable!.dispose()
             _disposable = nil
         }

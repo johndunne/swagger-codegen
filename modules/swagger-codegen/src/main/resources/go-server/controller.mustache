@@ -1,119 +1,19 @@
-package controllers
+package {{packageName}}
 
-/**
- * Generated automatically from swagger-codegen. Don't edit here! There's no point :)
- * {{securityDefinitions}}
- **/
-{{hasAuthMethods}}
-{{authMethods}}
+{{#operations}}
 import (
-    "errors"
-    "net/http"
-    "{{project_name}}/{{handlers_package_name}}"
-    "{{project_name}}/helpers"
-{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "encoding/json" //{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
-{{#operations}}{{#operation}}{{#bodyParams}}{{#-first}}    "{{project_name}}/models" //ignore{{/-first}}{{/bodyParams}}{{/operation}}{{/operations}}
-{{#operations}}{{#operation}}{{#vendorExtensions.x-cache-control-header}}   "strings" //{{/vendorExtensions.x-cache-control-header}}{{/operation}}{{/operations}}
+	"net/http"
 )
 
-// Worth reading if you're using Martini: http://present.go-steel-programmers.org/martini-talk/martini.slide#14
+type {{classname}} struct {
 
-{{#operations}}{{#operation}}
-/* security: {{security}}
- * {{#authMethods}}
-    name : {{name}} type : {{type}}
- *  isBasic: {{isBasic}}, isOAuth: {{isOAuth}}, isApiKey {{isApiKey}}
- *  OAuth specific -> flow :{{flow}}, authorizationUrl: {{authorizationUrl}}, tokenUrl: {{tokenUrl}}
-    scopes: {{scopes}}
-    {{#scopes}}
-        {{scope}} -> {{description}}
-    {{/scopes}}
-    isCode:{{isCode}}, isPassword:{{isPassword}}, isApplication:{{isApplication}}, isImplicit:{{isImplicit}}
-    isKeyInQuery:{{isKeyInQuery}}, isKeyInHeader:{{isKeyInHeader}}
- * {{/authMethods}}
- */
-func {{operationId}}(w http.ResponseWriter, r *http.Request) { {{#vendorExtensions.x-cache-control-header}}
-    w.Header().Set("Cache-Control", strings.Replace("{{vendorExtensions.x-cache-control-header}}",":","=",4) ){{/vendorExtensions.x-cache-control-header}}
-    w.Header().Set("Content-Type", "{{#produces}}{{{mediaType}}}{{#hasMore}}, {{/hasMore}}{{/produces}}{{^produces}}Not defined{{/produces}}; charset=UTF-8")
-{{#createOrUpdateOperation}}{{#bodyParams}}
-    //var b []bytes
-    //var err error
-    //if b, err = ioutil.ReadAll(r.Body); err != nil {
-    //    panic(err)
-    //}
-    decoder := json.NewDecoder( r.Body )
-    //defer r.Body.Close()
-    obj := models.{{#bodyParams}}{{baseType}}{{/bodyParams}}{}
-    //if decoder_error := (&obj).Read(b); decoder_error != nil {
-    if decoder_error := (&obj).Read(decoder); decoder_error != nil {
-        if aerr, ok := decoder_error.(*helpers.HttpAPIError); ok {
-           helpers.SendClientJsonObject( w, r, aerr.ErrorCode, aerr.ErrorMessage )
-        } else {
-            helpers.SendClientJsonObject( w, r, 500, decoder_error )
-        }
-        return
-    }
-    {{#createOperation}}{{#uniqueItems_dont_work}}
-        // doesn't work
-        encountered := map[{{containerType}}]bool{}
-        result := []{{containerType}}{}
-        for v := range obj.{{nameInCamelCase}} {
-            if encountered[obj.{{nameInCamelCase}}[v]] == true {
-                return errors.New("Value '{{name}}' must contain only unique values.")
-            } else {
-                // Record this element as an encountered element.
-                encountered[obj.{{nameInCamelCase}}[v]] = true
-            }
-        }{{/uniqueItems_dont_work}}
-{{/createOperation}}{{/bodyParams}}{{#bodyParams}}
-    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do( w, r, obj );error_code == 0 {
-{{/bodyParams}}{{^bodyParams}}
-    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do( w, r );error_code == 0 {
-{{/bodyParams}}
-{{/createOrUpdateOperation}}
-{{^createOrUpdateOperation}}
-    if result, err, error_code := {{handlers_package_name}}.{{operationId}}Do(w,r );error_code == 0 {
-{{/createOrUpdateOperation}}
-        // error_code = 0 is taken to mean don't do anything. The function has already handled output to the client
-    } else if err != nil {
-        if aerr, ok := err.(*helpers.HttpAPIError); ok {
-            helpers.SendClientJsonObject( w, r, aerr.ErrorCode, err )
-        }else{
-            helpers.SendClientJsonObject( w, r, 500, err)
-        }
-    }else if result == nil {
-        panic( errors.New("I can't send an empty body") )
-    }else {
-        helpers.SendClientJsonObject( w, r, error_code, result )
-    }
 }
+
+{{#operation}}
+func {{nickname}}(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+}
+
 {{/operation}}
 {{/operations}}
-
-/*func setupAuthBoss(){
-    ab := authboss.New() // Usually store this globally
-    ab.MountPath = "/authboss"
-    ab.LogWriter = os.Stdout
-
-    if err := ab.Init(); err != nil {
-        // Handle error, don't let program continue to run
-        panic(err)
-    }
-
-    // Make sure to put authboss's router somewhere
-    m.Router.AddRoute("GET","/authboss", ab.NewRouter().ServeHTTP)
-}*/
-
-{{#includePlaceHolderHandlers}}{{#operations}}
-    {{#operation}}
-{{#createOrUpdateOperation}}
-func {{operationId}}Do(w http.ResponseWriter, r *http.Request, obj {{#bodyParams}}{{baseType}}{{/bodyParams}} ) (interface{}, error, int) {
-{{/createOrUpdateOperation}}
-{{^createOrUpdateOperation}}
-func {{operationId}}Do(w http.ResponseWriter, r *http.Request) (interface{}, error, int) {
-{{/createOrUpdateOperation}}
-    return nil, nil, 0
-}
-    {{/operation}}
-{{/operations}}
-{{/includePlaceHolderHandlers}}

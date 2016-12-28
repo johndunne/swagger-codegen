@@ -12,8 +12,8 @@ class Producer<Element> : Observable<Element> {
     override init() {
         super.init()
     }
-    
-    override func subscribe<O : ObserverType>(_ observer: O) -> Disposable where O.E == Element {
+
+    override func subscribe<O : ObserverType where O.E == Element>(observer: O) -> Disposable {
         if !CurrentThreadScheduler.isScheduleRequired {
             return run(observer)
         }
@@ -23,8 +23,8 @@ class Producer<Element> : Observable<Element> {
             }
         }
     }
-    
-    func run<O : ObserverType>(_ observer: O) -> Disposable where O.E == Element {
+
+    func run<O : ObserverType where O.E == Element>(observer: O) -> Disposable {
         abstractMethod()
     }
 }
